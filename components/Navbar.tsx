@@ -23,11 +23,23 @@ export default function Navbar() {
         </div>
 
         {/* Center section: Main Navigation Links */}
-        <div className="hidden md:flex items-center space-x-4 lg:space-x-6 text-[#4a1c10] font-[family-name:var(--font-anton)] text-xl tracking-widest pt-1 whitespace-nowrap">
-          <Link href="/menu" className="hover:opacity-80 transition-opacity">MENU</Link>
-          <Link href="/catering" className="hover:opacity-80 transition-opacity">CATERING</Link>
-          <Link href="/values" className="hover:opacity-80 transition-opacity">OUR VALUES</Link>
-          <Link href="/values" className="hover:opacity-80 transition-opacity">DOWNLOAD APP</Link>
+        <div className="hidden md:flex items-center space-x-4 lg:space-x-6 text-[#4a1c10] font-[family-name:var(--font-anton)] text-xl tracking-widest pt-3 whitespace-nowrap">
+          <Link href="/menu" className="group relative pb-2 transition-colors hover:text-[#9b1b1b]">
+            MENU
+            <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+          </Link>
+          <Link href="/catering" className="group relative pb-2 transition-colors hover:text-[#9b1b1b]">
+            CATERING
+            <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+          </Link>
+          <Link href="/values" className="group relative pb-2 transition-colors hover:text-[#9b1b1b]">
+            OUR VALUES
+            <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+          </Link>
+          <Link href="/download" className="group relative pb-2 transition-colors hover:text-[#9b1b1b]">
+            DOWNLOAD APP
+            <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+          </Link>
         </div>
       </div>
 
