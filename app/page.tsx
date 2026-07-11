@@ -1,6 +1,7 @@
 import HeroSection from "@/components/HeroSection";
 import PopularItems from "@/components/menu/PopularItems";
 import BestSellers from "@/components/menu/BestSellers";
+import ExploreMenu from "@/components/menu/ExploreMenu";
 
 export default function Home() {
   return (
@@ -40,6 +41,7 @@ export default function Home() {
         <hr className="border-t border-gray-500" />
       </div>
 
+      <ExploreMenu />
       <PopularItems />
       <BestSellers />
     </main>

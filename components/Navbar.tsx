@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { User } from "lucide-react";
@@ -24,10 +26,21 @@ export default function Navbar() {
 
         {/* Center section: Main Navigation Links */}
         <div className="hidden md:flex items-center space-x-4 lg:space-x-6 text-[#4a1c10] font-[family-name:var(--font-anton)] text-xl tracking-widest pt-3 whitespace-nowrap">
-          <Link href="/menu" className="group relative pb-2 transition-colors hover:text-[#9b1b1b]">
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              const element = document.getElementById('explore-menu');
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+                // Optional: update URL hash without jump
+                window.history.pushState(null, '', '/#explore-menu');
+              }
+            }} 
+            className="group relative pb-2 transition-colors hover:text-[#9b1b1b] cursor-pointer"
+          >
             MENU
             <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
-          </Link>
+          </button>
           <Link href="/catering" className="group relative pb-2 transition-colors hover:text-[#9b1b1b]">
             CATERING
             <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>

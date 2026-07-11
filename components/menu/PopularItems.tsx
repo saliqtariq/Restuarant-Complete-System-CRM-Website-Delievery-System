@@ -26,7 +26,7 @@ const popularItems = [
 
 export default function PopularItems() {
   return (
-    <section className="w-full bg-white pt-8 pb-4">
+    <section className="w-full bg-white pt-0 pb-4">
       <div className="max-w-7xl mx-auto px-4">
         <h2 
           className="text-[#4a1c0d] text-5xl md:text-7xl uppercase tracking-normal m-0 leading-none"
@@ -36,7 +36,7 @@ export default function PopularItems() {
         </h2>
 
         {/* Items Grid */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {popularItems.map((item) => (
             <div key={item.name} className="flex flex-col items-center text-center group cursor-pointer">
               <div className="w-full h-64 md:h-72 lg:h-80 mb-4 flex items-center justify-center">

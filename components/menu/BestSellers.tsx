@@ -9,6 +9,26 @@ const bestSellers = [
     price: "RS 650",
     image: "/Zinger Butcher.png",
   },
+  {
+    name: "SAUCY CHICKEN PARATHA",
+    price: "RS 670",
+    image: "/SaucyLachParatha.png",
+  },
+  {
+    name: "ABRAHAM'S DOUBLE STACK",
+    price: "RS 890",
+    image: "/Abraham's Double Stack.png",
+  },
+  {
+    name: "TWISTER WRAP COMBO",
+    price: "RS 760",
+    image: "/TwisterCombo.png",
+  },
+  {
+    name: "BURGER N CHICKEN COMBO",
+    price: "RS 550",
+    image: "/Burger n Chicken Combo.png",
+  },
 ];
 
 export default function BestSellers() {
@@ -23,10 +43,10 @@ export default function BestSellers() {
         </h2>
 
         {/* Items Grid */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-0 md:gap-y-2">
           {bestSellers.map((item) => (
-            <div key={item.name} className="flex flex-col items-center text-center group cursor-pointer">
-              <div className="w-full h-64 md:h-72 lg:h-80 mb-4 flex items-center justify-center">
+            <div key={item.name} className="flex flex-col items-center text-center group cursor-pointer -mt-2">
+              <div className="w-full h-40 md:h-48 lg:h-52 mb-2 flex items-center justify-center">
                 <img 
                   src={item.image} 
                   alt={item.name} 
