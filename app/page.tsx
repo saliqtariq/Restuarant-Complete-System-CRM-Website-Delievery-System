@@ -2,6 +2,7 @@ import HeroSection from "@/components/HeroSection";
 import PopularItems from "@/components/menu/PopularItems";
 import BestSellers from "@/components/menu/BestSellers";
 import ExploreMenu from "@/components/menu/ExploreMenu";
+import CrowdPleasers from "@/components/menu/CrowdPleasers";
 
 export default function Home() {
   return (
@@ -44,6 +45,7 @@ export default function Home() {
       <ExploreMenu />
       <PopularItems />
       <BestSellers />
+      <CrowdPleasers />
     </main>
   );
 }
