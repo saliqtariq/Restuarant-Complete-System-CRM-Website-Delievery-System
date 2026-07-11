@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const popularItems = [
   {
     name: "FAMILY MEALS",
@@ -39,11 +41,14 @@ export default function PopularItems() {
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {popularItems.map((item) => (
             <div key={item.name} className="flex flex-col items-center text-center group cursor-pointer">
-              <div className="w-full h-64 md:h-72 lg:h-80 mb-4 flex items-center justify-center">
-                <img 
-                  src={item.image} 
-                  alt={item.name} 
-                  className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+              <div className="relative w-full h-64 md:h-72 lg:h-80 mb-4 flex items-center justify-center">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-contain transition-transform duration-300 group-hover:scale-105"
+                  priority
                 />
               </div>
               <h3 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 
 const categories = [
   { name: "Everyday Value", image: "/EveryDayValue.png" },
@@ -86,11 +87,13 @@ export default function ExploreMenu() {
                    }}>
                 
                 {/* Image (popping out significantly) */}
-                <div className="absolute top-[-50px] bottom-[85px] left-1/2 transform -translate-x-1/2 w-[130%] flex items-end justify-center transition-transform duration-300 group-hover:scale-105 pointer-events-none">
-                  <img 
-                    src={cat.image} 
-                    alt={cat.name} 
-                    className="w-full h-full object-contain mix-blend-multiply drop-shadow-sm"
+                <div className="absolute top-[-50px] bottom-[85px] left-1/2 transform -translate-x-1/2 w-[130%] transition-transform duration-300 group-hover:scale-105 pointer-events-none">
+                  <Image
+                    src={cat.image}
+                    alt={cat.name}
+                    fill
+                    sizes="220px"
+                    className="object-contain mix-blend-multiply drop-shadow-sm"
                   />
                 </div>
 

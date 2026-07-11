@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const bestSellers = [
   {
     name: "CHICKEN N CHIPS",
@@ -46,11 +48,13 @@ export default function BestSellers() {
         <div className="mt-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-0 md:gap-y-2">
           {bestSellers.map((item) => (
             <div key={item.name} className="flex flex-col items-center text-center group cursor-pointer -mt-2">
-              <div className="w-full h-40 md:h-48 lg:h-52 mb-2 flex items-center justify-center">
-                <img 
-                  src={item.image} 
-                  alt={item.name} 
-                  className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+              <div className="relative w-full h-40 md:h-48 lg:h-52 mb-2">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-contain transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
               <h3 
