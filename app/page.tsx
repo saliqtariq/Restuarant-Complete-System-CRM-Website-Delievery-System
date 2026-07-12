@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <main className="flex-1 bg-white flex flex-col">
       <HeroSection />
-      
+
       {/* Join Rewards / Sign In Banner */}
       <section className="w-full bg-white py-6 md:py-8">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
@@ -19,14 +19,14 @@ export default function Home() {
           >
             RESERVE TABLE
           </a>
-          
-          <span 
+
+          <span
             className="text-[#461a0f] text-xl md:text-2xl"
             style={{ fontFamily: "var(--font-bebas)" }}
           >
             OR
           </span>
-          
+
           <a
             href="#signin"
             className="text-[#b4860b] text-xl md:text-2xl tracking-wide underline decoration-2 underline-offset-4 hover:text-[#916a08] transition"
