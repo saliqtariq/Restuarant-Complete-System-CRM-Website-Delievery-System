@@ -4,9 +4,9 @@ import { ArrowLeft } from "lucide-react";
 
 export default function DownloadAppPage() {
   return (
-    <main className="flex-1 bg-white flex flex-col md:flex-row min-h-[75vh] pt-6 md:pt-12 lg:pt-12 pb-16">
+    <main className="flex flex-1 flex-col items-start bg-white px-8 pb-16 pt-4 md:flex-row md:px-12 md:pt-6 lg:px-20">
       {/* Left Side: Typography & CTA */}
-      <div className="w-full md:w-[45%] lg:w-[40%] flex flex-col justify-start px-8 md:px-12 lg:px-20 z-10 bg-white">
+      <div className="z-10 flex w-full flex-col justify-start bg-white md:w-[45%] lg:w-[40%]">
         <h1
           className="text-[#3b1c0a] text-5xl md:text-6xl lg:text-[4rem] xl:text-[5rem] font-black uppercase leading-none tracking-normal mb-6"
           style={{ fontFamily: "var(--font-anton)" }}
@@ -30,15 +30,15 @@ export default function DownloadAppPage() {
         </div>
       </div>
 
-      {/* Right Side: Background Image */}
-      <div className="w-full md:w-[55%] lg:w-[60%] flex items-start justify-center md:justify-end px-8 md:px-12 mt-12 md:mt-0 lg:pr-24 min-h-[400px]">
-        <div className="relative w-full max-w-[18rem] md:max-w-sm lg:max-w-md xl:max-w-lg">
+      {/* Right Side: Phone Image */}
+      <div className="flex w-full items-start justify-center md:w-[55%] md:justify-end lg:w-[60%] lg:pr-4">
+        <div className="relative w-full max-w-[16rem] -translate-y-2 md:-translate-y-24 md:max-w-sm lg:max-w-md xl:max-w-lg">
           <Image
             src="/TransparentBgPlaceholder.png"
             alt="Abraham's Table App Coming Soon"
             width={1080}
             height={1080}
-            className="w-full h-auto object-contain drop-shadow-2xl"
+            className="h-auto w-full object-contain object-top drop-shadow-2xl"
             priority
           />
         </div>
