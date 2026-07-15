@@ -17,6 +17,8 @@ export default function SignInPage() {
   
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showUnverified, setShowUnverified] = useState(false);
+  const [resendingFromSignIn, setResendingFromSignIn] = useState(false);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,9 +45,40 @@ export default function SignInPage() {
       return;
     }
 
+    // Check if the user's email has been verified
+    if (!data.user?.app_metadata?.email_verified) {
+      // Sign out the unverified user immediately
+      await supabase.auth.signOut();
+      setShowUnverified(true);
+      setLoading(false);
+      return;
+    }
+
     // Success - redirect to home
     router.push("/");
     router.refresh(); // Refresh to update nav state
+  };
+
+  const handleResendFromSignIn = async () => {
+    setResendingFromSignIn(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+      } else {
+        const resData = await res.json();
+        setError(resData.error || "Failed to resend verification email.");
+        setResendingFromSignIn(false);
+      }
+    } catch {
+      setError("Failed to resend. Please try again.");
+      setResendingFromSignIn(false);
+    }
   };
 
   return (
@@ -82,6 +115,31 @@ export default function SignInPage() {
               {error}
             </div>
           )}
+          {/* Unverified Email Notice */}
+          {showUnverified && (
+            <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-md">
+              <div className="flex items-start gap-2.5">
+                <svg className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <div>
+                  <p className="text-amber-800 text-sm font-semibold mb-1">Email Not Verified</p>
+                  <p className="text-amber-700 text-xs mb-2 leading-relaxed">
+                    Please verify your email address before signing in. Check your inbox for the verification code.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleResendFromSignIn}
+                    disabled={resendingFromSignIn}
+                    className="text-xs text-[#a62116] font-bold hover:underline disabled:text-gray-400 transition-colors cursor-pointer"
+                  >
+                    {resendingFromSignIn ? "Sending..." : "Resend Verification Email \u2192"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Email */}
           <div className="mb-3">
             <label

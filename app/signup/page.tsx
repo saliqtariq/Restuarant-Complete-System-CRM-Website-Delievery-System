@@ -58,18 +58,37 @@ export default function SignUpPage() {
       return;
     }
 
-    if (data.session) {
-      // User was immediately logged in (email confirmation might be off)
-      router.push("/");
-      router.refresh();
-    } else {
-      // User needs to confirm email
-      setSuccess("Account created! Please check your email to confirm your registration.");
+    // Send verification email via Resend
+    try {
+      const verifyRes = await fetch("/api/send-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          firstName,
+          userId: data.user?.id,
+        }),
+      });
+
+      if (!verifyRes.ok) {
+        const verifyData = await verifyRes.json();
+        setError(verifyData.error || "Failed to send verification email.");
+        setLoading(false);
+        return;
+      }
+    } catch {
+      setError("Failed to send verification email. Please try again.");
       setLoading(false);
-      // Clear form
-      setEmail("");
-      setPassword("");
+      return;
     }
+
+    // Sign out the user — they must verify before they can use the app
+    if (data.session) {
+      await supabase.auth.signOut();
+    }
+
+    // Redirect to the OTP verification page
+    router.push(`/verify-email?email=${encodeURIComponent(email)}`);
   };
 
   return (
