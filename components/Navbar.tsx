@@ -2,13 +2,26 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { User, Menu, X } from "lucide-react";
+import { User, Menu, X, Minus, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useCartStore } from "@/lib/cartStore";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+
+  const items = useCartStore((s) => s.items);
+  const updateQuantity = useCartStore((s) => s.updateQuantity);
+  const removeItem = useCartStore((s) => s.removeItem);
+  const clearCart = useCartStore((s) => s.clearCart);
+  const totalItems = useCartStore((s) => s.totalItems);
+  const totalPrice = useCartStore((s) => s.totalPrice);
 
   const closeMobile = () => setMobileOpen(false);
+  const closeCart = () => setCartOpen(false);
+
+  const itemCount = totalItems();
+  const total = totalPrice();
 
   return (
     <>
@@ -32,20 +45,13 @@ export default function Navbar() {
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center space-x-4 lg:space-x-6 text-[#4a1c10] font-[family-name:var(--font-anton)] text-xl tracking-widest pt-3 whitespace-nowrap">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                const element = document.getElementById("explore-menu");
-                if (element) {
-                  element.scrollIntoView({ behavior: "smooth" });
-                  window.history.pushState(null, "", "/#explore-menu");
-                }
-              }}
+            <Link
+              href="/#explore-menu"
               className="group relative pb-2 transition-colors hover:text-[#9b1b1b] cursor-pointer"
             >
               MENU
               <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
-            </button>
+            </Link>
             <Link href="/catering" className="group relative pb-2 transition-colors hover:text-[#9b1b1b]">
               CATERING
               <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
@@ -76,9 +82,14 @@ export default function Navbar() {
           </Link>
 
           {/* Cart */}
-          <Link href="/cart" className="flex items-center space-x-2 hover:opacity-80 transition-opacity relative">
-            <Image src="/CartPic.png" alt="Cart" width={36} height={36} className="object-contain" />
-          </Link>
+          <button onClick={() => setCartOpen(true)} className="flex items-center space-x-2 hover:opacity-80 transition-opacity relative cursor-pointer">
+            <Image src="/AddtocartPic.png" alt="Cart" width={56} height={56} className="object-contain" />
+            {itemCount > 0 && (
+              <span className="absolute -top-1 -right-2 bg-[#a62116] text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md animate-[bounce_0.3s_ease-in-out]">
+                {itemCount}
+              </span>
+            )}
+          </button>
 
           {/* Hamburger — mobile only */}
           <button
@@ -127,18 +138,13 @@ export default function Navbar() {
 
         {/* Drawer Nav Links */}
         <nav className="flex flex-col px-6 pt-6 gap-1 font-[family-name:var(--font-anton)] text-xl tracking-widest text-[#4a1c10]">
-          <button
-            onClick={() => {
-              closeMobile();
-              setTimeout(() => {
-                const element = document.getElementById("explore-menu");
-                if (element) element.scrollIntoView({ behavior: "smooth" });
-              }, 300);
-            }}
-            className="text-left py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors"
+          <Link
+            href="/#explore-menu"
+            onClick={closeMobile}
+            className="text-left py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors block"
           >
             MENU
-          </button>
+          </Link>
           <Link href="/catering" onClick={closeMobile} className="py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors block">
             CATERING
           </Link>
@@ -156,6 +162,170 @@ export default function Navbar() {
             SIGN IN / JOIN
           </Link>
         </nav>
+      </div>
+
+      {/* Cart Drawer Overlay */}
+      {cartOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40"
+          onClick={closeCart}
+        />
+      )}
+
+      {/* Cart Slide-in Drawer */}
+      <div
+        className={`fixed top-0 right-0 h-full w-80 md:w-96 bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${
+          cartOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {/* Cart Header */}
+        <div className="flex items-center justify-between px-6 h-24 border-b border-gray-100">
+          <h2 className="text-3xl font-bold uppercase text-[#4a1c10] m-0 tracking-wider" style={{ fontFamily: "var(--font-bebas)" }}>
+            Your Cart {itemCount > 0 && <span className="text-[#b4860b]">({itemCount})</span>}
+          </h2>
+          <button
+            onClick={closeCart}
+            className="text-[#4a1c10] hover:text-[#9b1b1b] transition-colors"
+            aria-label="Close cart"
+          >
+            <X size={26} strokeWidth={2.5} />
+          </button>
+        </div>
+
+        {items.length === 0 ? (
+          /* Cart Body - Empty State */
+          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+            <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6 shadow-inner">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-300">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                <path d="M3 6h18" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+            </div>
+            <h3 className="text-3xl uppercase text-[#4a1c0d] mb-3 tracking-wider font-bold" style={{ fontFamily: "var(--font-bebas)" }}>
+              Cart is Empty
+            </h3>
+            <p className="text-gray-500 text-base mb-8 font-medium">
+              Looks like you haven&apos;t added any delicious items yet.
+            </p>
+            <Link
+              href="/#explore-menu"
+              onClick={closeCart}
+              className="w-full bg-[#a62116] hover:bg-[#851a11] text-white uppercase font-bold tracking-widest py-4 px-6 rounded-md transition-all duration-300 shadow-md flex justify-center"
+              style={{ fontFamily: "var(--font-bebas)", fontSize: "1.2rem" }}
+            >
+              Explore Menu
+            </Link>
+          </div>
+        ) : (
+          /* Cart Body - Items */
+          <>
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {items.map((item) => (
+                <div
+                  key={item.name}
+                  className="flex items-center gap-3 bg-gray-50 rounded-lg p-3 border border-gray-100 transition-all hover:shadow-sm"
+                >
+                  {/* Item Image */}
+                  <div className="relative w-16 h-16 flex-shrink-0 rounded-md overflow-hidden bg-white">
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      fill
+                      sizes="64px"
+                      className="object-contain"
+                    />
+                  </div>
+
+                  {/* Item Details */}
+                  <div className="flex-1 min-w-0">
+                    <h4
+                      className="text-[#4a1c0d] text-sm uppercase leading-tight m-0 truncate font-bold"
+                      style={{ fontFamily: "var(--font-bebas)", letterSpacing: "0.05em" }}
+                    >
+                      {item.name}
+                    </h4>
+                    <p
+                      className="text-[#b4860b] text-sm m-0 mt-0.5 font-semibold"
+                      style={{ fontFamily: "var(--font-bebas)" }}
+                    >
+                      {item.price}
+                    </p>
+
+                    {/* Quantity Controls */}
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <button
+                        onClick={() => updateQuantity(item.name, item.quantity - 1)}
+                        className="w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#4a1c0d] hover:bg-gray-100 transition-colors"
+                        aria-label="Decrease quantity"
+                      >
+                        <Minus size={12} strokeWidth={3} />
+                      </button>
+                      <span
+                        className="text-[#4a1c0d] text-sm font-bold min-w-[1.2rem] text-center"
+                        style={{ fontFamily: "var(--font-bebas)" }}
+                      >
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(item.name, item.quantity + 1)}
+                        className="w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#4a1c0d] hover:bg-gray-100 transition-colors"
+                        aria-label="Increase quantity"
+                      >
+                        <Plus size={12} strokeWidth={3} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Remove Button */}
+                  <button
+                    onClick={() => removeItem(item.name)}
+                    className="flex-shrink-0 text-gray-400 hover:text-[#a62116] transition-colors p-1"
+                    aria-label={`Remove ${item.name}`}
+                  >
+                    <Trash2 size={16} strokeWidth={2} />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Cart Footer */}
+            <div className="border-t border-gray-100 p-4 space-y-3">
+              {/* Total */}
+              <div className="flex items-center justify-between">
+                <span
+                  className="text-[#4a1c0d] text-2xl uppercase font-bold"
+                  style={{ fontFamily: "var(--font-bebas)" }}
+                >
+                  Total
+                </span>
+                <span
+                  className="text-[#b4860b] text-2xl font-bold"
+                  style={{ fontFamily: "var(--font-bebas)" }}
+                >
+                  RS {total.toLocaleString()}
+                </span>
+              </div>
+
+              {/* Checkout Button */}
+              <button
+                className="w-full bg-[#a62116] hover:bg-[#851a11] text-white uppercase font-bold tracking-widest py-4 px-6 rounded-md transition-all duration-300 shadow-md"
+                style={{ fontFamily: "var(--font-bebas)", fontSize: "1.2rem" }}
+              >
+                Checkout
+              </button>
+
+              {/* Clear Cart */}
+              <button
+                onClick={clearCart}
+                className="w-full text-center text-gray-400 hover:text-[#a62116] text-sm uppercase tracking-wider font-semibold transition-colors py-1"
+                style={{ fontFamily: "var(--font-bebas)" }}
+              >
+                Clear Cart
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </>
   );
