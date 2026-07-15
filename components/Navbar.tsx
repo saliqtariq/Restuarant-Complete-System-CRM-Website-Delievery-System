@@ -2,13 +2,34 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { User, Menu, X, Minus, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { User, Menu, X, Minus, Plus, Trash2, CircleUserRound } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/backend/supabase";
 import { useCartStore } from "@/lib/cartStore";
+import ProfileDrawer from "./ProfileDrawer";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
 
   const items = useCartStore((s) => s.items);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
@@ -76,10 +97,27 @@ export default function Navbar() {
           </Link>
 
           {/* User / Sign In */}
-          <Link href="/signin" className="hidden sm:flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <User size={30} className="stroke-[2.5]" />
-            <span className="pt-1">SIGN IN / JOIN</span>
-          </Link>
+          {user ? (
+            <button onClick={() => setProfileOpen(true)} title="Open Profile" className="hidden sm:flex items-center space-x-2 hover:opacity-80 transition-opacity text-black cursor-pointer">
+              {user.user_metadata?.avatar_url ? (
+                <img src={user.user_metadata.avatar_url} alt="Profile" className="w-8 h-8 rounded-full object-cover" />
+              ) : (
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="12" fill="black"/>
+                  <circle cx="12" cy="8.5" r="4" fill="white"/>
+                  <path d="M5.5 20C5.5 16.5 8.5 14.5 12 14.5C15.5 14.5 18.5 16.5 18.5 20" fill="white"/>
+                </svg>
+              )}
+              <span className="uppercase text-2xl tracking-widest font-bold pt-1" style={{ fontFamily: "var(--font-bebas)" }}>
+                {user.user_metadata?.first_name || "PROFILE"}
+              </span>
+            </button>
+          ) : (
+            <Link href="/signin" className="hidden sm:flex items-center space-x-2 hover:opacity-80 transition-opacity">
+              <User size={30} className="stroke-[2.5]" />
+              <span className="pt-1">SIGN IN / JOIN</span>
+            </Link>
+          )}
 
           {/* Cart */}
           <button onClick={() => setCartOpen(true)} className="flex items-center space-x-2 hover:opacity-80 transition-opacity relative cursor-pointer">
@@ -157,10 +195,25 @@ export default function Navbar() {
           <Link href="/locations" onClick={closeMobile} className="py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors block">
             FIND LOCATION
           </Link>
-          <Link href="/signin" onClick={closeMobile} className="py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors flex items-center gap-3">
-            <User size={22} className="stroke-[2.5]" />
-            SIGN IN / JOIN
-          </Link>
+          {user ? (
+            <button onClick={() => { setProfileOpen(true); closeMobile(); }} className="py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors flex items-center gap-3 text-left w-full uppercase text-black font-bold text-xl tracking-widest" style={{ fontFamily: "var(--font-bebas)" }}>
+              {user.user_metadata?.avatar_url ? (
+                <img src={user.user_metadata.avatar_url} alt="Profile" className="w-7 h-7 rounded-full object-cover" />
+              ) : (
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="12" fill="black"/>
+                  <circle cx="12" cy="8.5" r="4" fill="white"/>
+                  <path d="M5.5 20C5.5 16.5 8.5 14.5 12 14.5C15.5 14.5 18.5 16.5 18.5 20" fill="white"/>
+                </svg>
+              )}
+              <span className="pt-1">{user.user_metadata?.first_name || "PROFILE"}</span>
+            </button>
+          ) : (
+            <Link href="/signin" onClick={closeMobile} className="py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors flex items-center gap-3">
+              <User size={22} className="stroke-[2.5]" />
+              SIGN IN / JOIN
+            </Link>
+          )}
         </nav>
       </div>
 
@@ -224,55 +277,55 @@ export default function Navbar() {
               {items.map((item) => (
                 <div
                   key={item.name}
-                  className="flex items-center gap-3 bg-gray-50 rounded-lg p-3 border border-gray-100 transition-all hover:shadow-sm"
+                  className="flex items-center gap-4 bg-gray-50 rounded-lg p-4 border border-gray-100 transition-all hover:shadow-sm"
                 >
                   {/* Item Image */}
-                  <div className="relative w-16 h-16 flex-shrink-0 rounded-md overflow-hidden bg-white">
+                  <div className="relative w-24 h-24 flex-shrink-0 rounded-md overflow-hidden bg-white shadow-sm border border-gray-100">
                     <Image
                       src={item.image}
                       alt={item.name}
                       fill
-                      sizes="64px"
-                      className="object-contain"
+                      sizes="96px"
+                      className="object-contain p-1"
                     />
                   </div>
 
                   {/* Item Details */}
                   <div className="flex-1 min-w-0">
                     <h4
-                      className="text-[#4a1c0d] text-sm uppercase leading-tight m-0 truncate font-bold"
+                      className="text-[#4a1c0d] text-lg uppercase leading-tight m-0 font-bold"
                       style={{ fontFamily: "var(--font-bebas)", letterSpacing: "0.05em" }}
                     >
                       {item.name}
                     </h4>
                     <p
-                      className="text-[#b4860b] text-sm m-0 mt-0.5 font-semibold"
+                      className="text-[#b4860b] text-base m-0 mt-1 font-semibold"
                       style={{ fontFamily: "var(--font-bebas)" }}
                     >
                       {item.price}
                     </p>
 
                     {/* Quantity Controls */}
-                    <div className="flex items-center gap-2 mt-1.5">
+                    <div className="flex items-center gap-3 mt-2">
                       <button
                         onClick={() => updateQuantity(item.name, item.quantity - 1)}
-                        className="w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#4a1c0d] hover:bg-gray-100 transition-colors"
+                        className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#4a1c0d] hover:bg-gray-100 transition-colors"
                         aria-label="Decrease quantity"
                       >
-                        <Minus size={12} strokeWidth={3} />
+                        <Minus size={14} strokeWidth={3} />
                       </button>
                       <span
-                        className="text-[#4a1c0d] text-sm font-bold min-w-[1.2rem] text-center"
+                        className="text-[#4a1c0d] text-lg font-bold min-w-[1.5rem] text-center"
                         style={{ fontFamily: "var(--font-bebas)" }}
                       >
                         {item.quantity}
                       </span>
                       <button
                         onClick={() => updateQuantity(item.name, item.quantity + 1)}
-                        className="w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#4a1c0d] hover:bg-gray-100 transition-colors"
+                        className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#4a1c0d] hover:bg-gray-100 transition-colors"
                         aria-label="Increase quantity"
                       >
-                        <Plus size={12} strokeWidth={3} />
+                        <Plus size={14} strokeWidth={3} />
                       </button>
                     </div>
                   </div>
@@ -327,6 +380,13 @@ export default function Navbar() {
           </>
         )}
       </div>
+
+      <ProfileDrawer 
+        isOpen={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        user={user}
+        handleSignOut={handleSignOut}
+      />
     </>
   );
 }
