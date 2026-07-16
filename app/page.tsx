@@ -3,6 +3,7 @@ import PopularItems from "@/components/menu/PopularItems";
 import BestSellers from "@/components/menu/BestSellers";
 import ExploreMenu from "@/components/menu/ExploreMenu";
 import CrowdPleasers from "@/components/menu/CrowdPleasers";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -27,13 +28,13 @@ export default function Home() {
             OR
           </span>
 
-          <a
-            href="#signin"
+          <Link
+            href="/menu"
             className="text-[#b4860b] text-xl md:text-2xl tracking-wide underline decoration-2 underline-offset-4 hover:text-[#916a08] transition"
             style={{ fontFamily: "var(--font-bebas)" }}
           >
-            SIGN IN
-          </a>
+            START ORDER
+          </Link>
         </div>
       </section>
 

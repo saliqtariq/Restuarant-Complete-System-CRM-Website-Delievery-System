@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 export default function HeroSection() {
   return (
@@ -74,13 +75,13 @@ export default function HeroSection() {
           </p>
 
           {/* Order Now Button */}
-          <a
-            href="#order"
+          <Link
+            href="/menu"
             className="inline-block bg-[#a62116] hover:bg-[#851a11] text-white rounded-md text-lg md:text-xl tracking-wide px-6 py-1.5 transition-colors duration-300"
             style={{ fontFamily: "var(--font-bebas)" }}
           >
             ORDER NOW
-          </a>
+          </Link>
         </div>
       </div>
     </section>

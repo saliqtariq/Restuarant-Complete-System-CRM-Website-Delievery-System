@@ -24,7 +24,7 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
   const [gender, setGender] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [activeView, setActiveView] = useState<"main" | "orders">("main");
+  const [activeView, setActiveView] = useState<"main" | "orders" | "favorites">("main");
 
   // Initialize form state when user changes or drawer opens
   useEffect(() => {
@@ -296,13 +296,16 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
               <CreditCard className="text-[#4a1c10]" size={24} />
               <span className="text-xl text-black font-medium tracking-wide">My Cards</span>
             </button>
-            <button className="flex items-center gap-4 px-6 py-5 hover:bg-gray-50 transition-colors w-full text-left cursor-pointer">
+            <button 
+              onClick={() => setActiveView("favorites")}
+              className="flex items-center gap-4 px-6 py-5 hover:bg-gray-50 transition-colors w-full text-left cursor-pointer"
+            >
               <Heart className="text-[#4a1c10]" size={24} />
               <span className="text-xl text-black font-medium tracking-wide">My Favorites</span>
             </button>
           </div>
           </>
-          ) : (
+          ) : activeView === "orders" ? (
             /* Order History View */
             <div className="flex-1 flex flex-col bg-[#f4f4f4] min-h-full">
               <div className="flex items-center gap-3 px-6 py-5">
@@ -325,6 +328,39 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
                   onClick={() => {
                     onClose();
                     // Optional: You could navigate or scroll to the menu here
+                  }}
+                  className="bg-[#e5002a] text-white px-8 py-3 rounded-md font-bold uppercase tracking-wider hover:bg-[#c40024] transition-colors"
+                >
+                  EXPLORE MENU
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Favorites View */
+            <div className="flex-1 flex flex-col bg-[#f4f4f4] min-h-full">
+              <div className="flex items-center gap-3 px-6 py-5">
+                <button 
+                  onClick={() => setActiveView("main")} 
+                  className="flex items-center justify-center w-6 h-6 rounded-full border-[1.5px] border-[#e5002a] text-[#e5002a] hover:bg-red-50 transition-colors shrink-0"
+                >
+                  <ChevronLeft size={16} strokeWidth={3} />
+                </button>
+                <h3 className="text-2xl font-bold text-black uppercase m-0 mt-1" style={{ fontFamily: "var(--font-bebas)" }}>
+                  My Favorites
+                </h3>
+              </div>
+              
+              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+                <Heart className="text-gray-300 mb-6" size={80} strokeWidth={1} />
+                <h4 className="text-2xl font-bold text-black mb-4 tracking-tight" style={{ fontFamily: "var(--font-bebas)" }}>
+                  No Favorites Yet
+                </h4>
+                <p className="text-gray-500 text-sm mb-8">
+                  Tap the heart icon on any item to add it to your favorites.
+                </p>
+                <button 
+                  onClick={() => {
+                    onClose();
                   }}
                   className="bg-[#e5002a] text-white px-8 py-3 rounded-md font-bold uppercase tracking-wider hover:bg-[#c40024] transition-colors"
                 >

@@ -14,6 +14,13 @@ export default function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
 
+  // Listen for custom event to open the drawer
+  useEffect(() => {
+    const handleOpenProfile = () => setProfileOpen(true);
+    window.addEventListener("open-profile-drawer", handleOpenProfile);
+    return () => window.removeEventListener("open-profile-drawer", handleOpenProfile);
+  }, []);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -103,9 +110,9 @@ export default function Navbar() {
                 <img src={user.user_metadata.avatar_url} alt="Profile" className="w-8 h-8 rounded-full object-cover" />
               ) : (
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="12" fill="black"/>
-                  <circle cx="12" cy="8.5" r="4" fill="white"/>
-                  <path d="M5.5 20C5.5 16.5 8.5 14.5 12 14.5C15.5 14.5 18.5 16.5 18.5 20" fill="white"/>
+                  <circle cx="12" cy="12" r="12" fill="black" />
+                  <circle cx="12" cy="8.5" r="4" fill="white" />
+                  <path d="M5.5 20C5.5 16.5 8.5 14.5 12 14.5C15.5 14.5 18.5 16.5 18.5 20" fill="white" />
                 </svg>
               )}
               <span className="uppercase text-2xl tracking-widest font-bold pt-1" style={{ fontFamily: "var(--font-bebas)" }}>
@@ -150,9 +157,8 @@ export default function Navbar() {
 
       {/* Mobile Slide-in Drawer */}
       <div
-        className={`fixed top-0 left-0 h-full w-72 bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out md:hidden flex flex-col ${
-          mobileOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 left-0 h-full w-72 bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out md:hidden flex flex-col ${mobileOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         {/* Drawer Header */}
         <div className="flex items-center justify-between px-6 h-24 border-b border-gray-100">
@@ -201,9 +207,9 @@ export default function Navbar() {
                 <img src={user.user_metadata.avatar_url} alt="Profile" className="w-7 h-7 rounded-full object-cover" />
               ) : (
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="12" fill="black"/>
-                  <circle cx="12" cy="8.5" r="4" fill="white"/>
-                  <path d="M5.5 20C5.5 16.5 8.5 14.5 12 14.5C15.5 14.5 18.5 16.5 18.5 20" fill="white"/>
+                  <circle cx="12" cy="12" r="12" fill="black" />
+                  <circle cx="12" cy="8.5" r="4" fill="white" />
+                  <path d="M5.5 20C5.5 16.5 8.5 14.5 12 14.5C15.5 14.5 18.5 16.5 18.5 20" fill="white" />
                 </svg>
               )}
               <span className="pt-1">{user.user_metadata?.first_name || "PROFILE"}</span>
@@ -227,9 +233,8 @@ export default function Navbar() {
 
       {/* Cart Slide-in Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 md:w-96 bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${
-          cartOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-0 right-0 h-full w-80 md:w-96 bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${cartOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         {/* Cart Header */}
         <div className="flex items-center justify-between px-6 h-24 border-b border-gray-100">
@@ -381,7 +386,7 @@ export default function Navbar() {
         )}
       </div>
 
-      <ProfileDrawer 
+      <ProfileDrawer
         isOpen={profileOpen}
         onClose={() => setProfileOpen(false)}
         user={user}

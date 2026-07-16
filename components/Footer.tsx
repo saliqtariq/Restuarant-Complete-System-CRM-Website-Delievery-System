@@ -1,8 +1,10 @@
+"use client";
+
 import Image from 'next/image';
 import Link from 'next/link';
 const Facebook = ({ size = 24 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
   </svg>
 );
 
@@ -72,39 +74,37 @@ export default function Footer() {
                 className="h-[52px] w-auto object-contain"
               />
 
-              {/* JOIN ABRAHAM'S */}
+              {/* Welcome Back */}
               <p className="mt-1 text-[#a32a22] text-[8px] font-bold uppercase tracking-[0.14em] leading-none whitespace-nowrap">
-                Join Abraham&apos;s
+                Welcome Back,
               </p>
 
-              {/* TABLE */}
+              {/* Name */}
               <h2
                 className="text-[2rem] leading-none font-normal uppercase text-[#451400]"
                 style={{ fontFamily: "var(--font-anton)" }}
               >
-                Table
+                Saliq
               </h2>
 
               {/* Subtitle */}
               <p className="mt-1.5 text-[#6b7280] text-[10px] leading-snug">
-                Be part of our family and
+                Check your rewards and
                 <br />
-                help us serve unforgettable meals.
+                recent order history.
               </p>
 
-              {/* Join Now button */}
-              <Link
-                href="/login"
+              {/* View Account button */}
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.dispatchEvent(new Event("open-profile-drawer"));
+                }}
                 className="mt-2.5 w-full border border-[#451400] rounded-sm bg-white px-3 py-1.5 text-[#451400] text-sm font-bold uppercase tracking-wide hover:bg-[#451400] hover:text-white transition-colors"
                 style={{ fontFamily: "var(--font-anton)" }}
               >
-                Join Now
-              </Link>
-
-              {/* Create an Account */}
-              <Link href="/signup" className="mt-2 text-[#c8a94e] text-[8px] font-bold uppercase tracking-[0.1em] hover:text-[#a8892e] transition-colors">
-                Create an Account
-              </Link>
+                View Account
+              </button>
             </div>
           </div>
         </div>
