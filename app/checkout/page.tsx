@@ -11,7 +11,7 @@ export default function CheckoutPage() {
   const totalPrice = useCartStore((s) => s.totalPrice);
   const clearCart = useCartStore((s) => s.clearCart);
 
-  const [paymentMethod, setPaymentMethod] = useState<"cod" | "jazzcash" | "easypaisa" | "card">("cod");
+  const [paymentMethod, setPaymentMethod] = useState<"cod">("cod");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
@@ -21,19 +21,52 @@ export default function CheckoutPage() {
   const gst = subtotal * 0.16; // 16% GST
   const grandTotal = subtotal + deliveryFee + gst;
 
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate API call to backend
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    
-    // Generate a random order number
-    const newOrderNum = "ORD-" + Math.floor(100000 + Math.random() * 900000);
-    setOrderNumber(newOrderNum);
-    setIsSuccess(true);
-    setIsSubmitting(false);
-    clearCart();
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items,
+          delivery: {
+            fullName,
+            phone,
+            city,
+            address,
+            paymentMethod: "cod"
+          },
+          financials: {
+            subtotal,
+            deliveryFee,
+            gst,
+            grandTotal
+          }
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Something went wrong");
+      }
+
+      setOrderNumber(data.orderNumber);
+      setIsSuccess(true);
+      clearCart();
+    } catch (error) {
+      console.error("Failed to place order:", error);
+      alert("Failed to place order. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isSuccess) {
@@ -117,19 +150,19 @@ export default function CheckoutPage() {
               <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1 md:col-span-2">
                   <label className="text-sm font-bold text-gray-700">Full Name</label>
-                  <input type="text" required className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="John Doe" />
+                  <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="John Doe" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-bold text-gray-700">Phone Number</label>
-                  <input type="tel" required className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="03XXXXXXXXX" />
+                  <input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="03XXXXXXXXX" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-bold text-gray-700">City</label>
-                  <input type="text" required className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="Lahore" />
+                  <input type="text" required value={city} onChange={(e) => setCity(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="Lahore" />
                 </div>
                 <div className="space-y-1 md:col-span-2">
                   <label className="text-sm font-bold text-gray-700">Full Address</label>
-                  <textarea required rows={3} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="House #, Street, Area..."></textarea>
+                  <textarea required rows={3} value={address} onChange={(e) => setAddress(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="House #, Street, Area..."></textarea>
                 </div>
               </div>
             </div>
@@ -148,60 +181,11 @@ export default function CheckoutPage() {
               </div>
               <div className="p-5 space-y-3">
                 {/* COD */}
-                <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${paymentMethod === 'cod' ? 'border-[#e5002a] bg-red-50/50' : 'border-gray-200 hover:border-gray-300'}`}>
-                  <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="w-4 h-4 text-[#e5002a] accent-[#e5002a]" />
-                  <Banknote className={`ml-3 mr-2 ${paymentMethod === 'cod' ? 'text-[#e5002a]' : 'text-gray-400'}`} size={20} />
-                  <span className={`font-medium ${paymentMethod === 'cod' ? 'text-black' : 'text-gray-600'}`}>Cash on Delivery</span>
+                <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors border-[#e5002a] bg-red-50/50`}>
+                  <input type="radio" name="payment" value="cod" checked={true} readOnly className="w-4 h-4 text-[#e5002a] accent-[#e5002a]" />
+                  <Banknote className="ml-3 mr-2 text-[#e5002a]" size={20} />
+                  <span className="font-medium text-black">Cash on Delivery</span>
                 </label>
-
-                {/* Card */}
-                <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${paymentMethod === 'card' ? 'border-[#e5002a] bg-red-50/50' : 'border-gray-200 hover:border-gray-300'}`}>
-                  <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} className="w-4 h-4 text-[#e5002a] accent-[#e5002a]" />
-                  <CreditCard className={`ml-3 mr-2 ${paymentMethod === 'card' ? 'text-[#e5002a]' : 'text-gray-400'}`} size={20} />
-                  <span className={`font-medium ${paymentMethod === 'card' ? 'text-black' : 'text-gray-600'}`}>Credit/Debit Card</span>
-                </label>
-
-                {/* JazzCash */}
-                <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${paymentMethod === 'jazzcash' ? 'border-[#e5002a] bg-red-50/50' : 'border-gray-200 hover:border-gray-300'}`}>
-                  <input type="radio" name="payment" value="jazzcash" checked={paymentMethod === 'jazzcash'} onChange={() => setPaymentMethod('jazzcash')} className="w-4 h-4 text-[#e5002a] accent-[#e5002a]" />
-                  <Wallet className={`ml-3 mr-2 ${paymentMethod === 'jazzcash' ? 'text-[#e5002a]' : 'text-gray-400'}`} size={20} />
-                  <span className={`font-medium ${paymentMethod === 'jazzcash' ? 'text-black' : 'text-gray-600'}`}>JazzCash</span>
-                </label>
-
-                {/* EasyPaisa */}
-                <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${paymentMethod === 'easypaisa' ? 'border-[#e5002a] bg-red-50/50' : 'border-gray-200 hover:border-gray-300'}`}>
-                  <input type="radio" name="payment" value="easypaisa" checked={paymentMethod === 'easypaisa'} onChange={() => setPaymentMethod('easypaisa')} className="w-4 h-4 text-[#e5002a] accent-[#e5002a]" />
-                  <Wallet className={`ml-3 mr-2 ${paymentMethod === 'easypaisa' ? 'text-[#e5002a]' : 'text-gray-400'}`} size={20} />
-                  <span className={`font-medium ${paymentMethod === 'easypaisa' ? 'text-black' : 'text-gray-600'}`}>EasyPaisa</span>
-                </label>
-
-                {/* Conditional Payment Fields */}
-                {paymentMethod === 'card' && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg space-y-3 border border-gray-200 animate-in fade-in slide-in-from-top-2">
-                    <div>
-                      <label className="text-xs font-bold text-gray-700 block mb-1">Card Number</label>
-                      <input type="text" required placeholder="0000 0000 0000 0000" className="w-full text-sm border border-gray-300 rounded px-3 py-2" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-xs font-bold text-gray-700 block mb-1">Expiry Date</label>
-                        <input type="text" required placeholder="MM/YY" className="w-full text-sm border border-gray-300 rounded px-3 py-2" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-bold text-gray-700 block mb-1">CVV</label>
-                        <input type="text" required placeholder="123" className="w-full text-sm border border-gray-300 rounded px-3 py-2" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {(paymentMethod === 'jazzcash' || paymentMethod === 'easypaisa') && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200 animate-in fade-in slide-in-from-top-2">
-                    <label className="text-xs font-bold text-gray-700 block mb-1">Mobile Account Number</label>
-                    <input type="tel" required placeholder="03XXXXXXXXX" className="w-full text-sm border border-gray-300 rounded px-3 py-2" />
-                    <p className="text-xs text-gray-500 mt-2">You will receive a prompt on your phone to enter your PIN to authorize the payment.</p>
-                  </div>
-                )}
               </div>
             </div>
 
