@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { X, FileText, MapPin, CreditCard, Heart, Loader2, Camera } from "lucide-react";
+import { X, FileText, MapPin, CreditCard, Heart, Loader2, Camera, ChevronLeft } from "lucide-react";
 import { supabase } from "@/backend/supabase";
 
 interface ProfileDrawerProps {
@@ -24,6 +24,7 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
   const [gender, setGender] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [activeView, setActiveView] = useState<"main" | "orders">("main");
 
   // Initialize form state when user changes or drawer opens
   useEffect(() => {
@@ -116,12 +117,8 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        {/* Decorative Top Red Bars */}
-        <div className="flex justify-center gap-1.5 pt-4">
-          <div className="w-8 h-4 bg-[#e5002a]"></div>
-          <div className="w-8 h-4 bg-[#e5002a]"></div>
-          <div className="w-8 h-4 bg-[#e5002a]"></div>
-        </div>
+        {/* Decorative Top Accent Line */}
+        <div className="w-full h-2 bg-gradient-to-r from-[#e5002a] via-[#4a1c0d] to-[#e5002a]"></div>
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 relative">
@@ -140,8 +137,10 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
-          {/* User Info / Edit Card */}
+        <div className="flex-1 overflow-y-auto flex flex-col">
+          {activeView === "main" ? (
+            <>
+              {/* User Info / Edit Card */}
           <div className="bg-[#f4f4f4] border-y border-gray-200 p-6">
             {!isEditing ? (
               <div className="flex items-start justify-between">
@@ -282,7 +281,10 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
 
           {/* Menu Items */}
           <div className="flex flex-col py-2">
-            <button className="flex items-center gap-4 px-6 py-5 hover:bg-gray-50 transition-colors w-full text-left cursor-pointer">
+            <button 
+              onClick={() => setActiveView("orders")}
+              className="flex items-center gap-4 px-6 py-5 hover:bg-gray-50 transition-colors w-full text-left cursor-pointer"
+            >
               <FileText className="text-[#4a1c10]" size={24} />
               <span className="text-xl text-black font-medium tracking-wide">Order History</span>
             </button>
@@ -299,21 +301,55 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
               <span className="text-xl text-black font-medium tracking-wide">My Favorites</span>
             </button>
           </div>
+          </>
+          ) : (
+            /* Order History View */
+            <div className="flex-1 flex flex-col bg-[#f4f4f4] min-h-full">
+              <div className="flex items-center gap-3 px-6 py-5">
+                <button 
+                  onClick={() => setActiveView("main")} 
+                  className="flex items-center justify-center w-6 h-6 rounded-full border-[1.5px] border-[#e5002a] text-[#e5002a] hover:bg-red-50 transition-colors shrink-0"
+                >
+                  <ChevronLeft size={16} strokeWidth={3} />
+                </button>
+                <h3 className="text-2xl font-bold text-black uppercase m-0 mt-1" style={{ fontFamily: "var(--font-bebas)" }}>
+                  Order History
+                </h3>
+              </div>
+              
+              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+                <h4 className="text-2xl font-bold text-black mb-8 tracking-tight" style={{ fontFamily: "var(--font-bebas)" }}>
+                  No Order Found? Start Ordering
+                </h4>
+                <button 
+                  onClick={() => {
+                    onClose();
+                    // Optional: You could navigate or scroll to the menu here
+                  }}
+                  className="bg-[#e5002a] text-white px-8 py-3 rounded-md font-bold uppercase tracking-wider hover:bg-[#c40024] transition-colors"
+                >
+                  EXPLORE MENU
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Footer Logout */}
-        <div className="p-6 flex justify-center border-t border-gray-100">
-          <button
-            onClick={() => {
-              handleSignOut();
-              onClose();
-            }}
-            className="bg-[#e5002a] hover:bg-[#c40024] text-white uppercase tracking-widest font-bold px-10 py-3 rounded-sm transition-colors cursor-pointer"
-            style={{ fontFamily: "var(--font-bebas)", fontSize: "1.2rem" }}
-          >
-            Logout
-          </button>
-        </div>
+        {/* Footer Logout (Only show on main view) */}
+        {activeView === "main" && (
+          <div className="p-6 flex justify-center border-t border-gray-100 mt-auto">
+            <button
+              onClick={() => {
+                handleSignOut();
+                onClose();
+              }}
+              className="bg-[#e5002a] hover:bg-[#c40024] text-white uppercase tracking-widest font-bold px-10 py-3 rounded-sm transition-colors cursor-pointer w-full"
+              style={{ fontFamily: "var(--font-bebas)", fontSize: "1.2rem" }}
+            >
+              Logout
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

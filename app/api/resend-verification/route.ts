@@ -46,6 +46,11 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: "Failed to generate new code" }, { status: 500 });
     }
 
+    // 🔥 FOR TESTING: Log the OTP to the terminal so we can copy it!
+    console.log(`\n\n========== NEW OTP FOR ${email} ==========`);
+    console.log(`   ${code}   `);
+    console.log(`==========================================\n\n`);
+
     // Send email via Resend
     const { error: emailError } = await resend.emails.send({
       from: "Abraham's Table <onboarding@resend.dev>",
@@ -55,8 +60,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (emailError) {
-      console.error("Resend email error:", emailError);
-      return Response.json({ error: "Failed to send verification email" }, { status: 500 });
+      console.error("Resend email error (Ignored for testing):", emailError);
+      // Commented out so the UI flow doesn't break while testing without a domain
+      // return Response.json({ error: "Failed to send verification email" }, { status: 500 });
     }
 
     return Response.json({ success: true });

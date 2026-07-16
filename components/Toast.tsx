@@ -9,8 +9,9 @@ import { X } from "lucide-react";
 export interface ToastMessage {
   id: string;
   name: string;
-  image: string;
-  price: string;
+  image?: string;
+  price?: string;
+  description?: string;
 }
 
 interface ToastState {
@@ -79,15 +80,17 @@ function ToastItem({ toast }: { toast: ToastMessage }) {
       </div>
 
       {/* Item Thumbnail */}
-      <div className="relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
-        <Image
-          src={toast.image}
-          alt={toast.name}
-          fill
-          sizes="56px"
-          className="object-contain p-1"
-        />
-      </div>
+      {toast.image && (
+        <div className="relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
+          <Image
+            src={toast.image}
+            alt={toast.name}
+            fill
+            sizes="56px"
+            className="object-contain p-1"
+          />
+        </div>
+      )}
 
       {/* Text */}
       <div className="flex-1 min-w-0">
@@ -97,7 +100,9 @@ function ToastItem({ toast }: { toast: ToastMessage }) {
         >
           {toast.name}
         </p>
-        <p className="text-gray-500 text-sm m-0 mt-1 font-medium">Added to cart</p>
+        <p className="text-gray-500 text-sm m-0 mt-1 font-medium">
+          {toast.description || "Added to cart"}
+        </p>
       </div>
 
       {/* Close */}

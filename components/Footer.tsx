@@ -33,11 +33,11 @@ export default function Footer() {
             <Link href="/careers" className="text-2xl text-[#451400] uppercase tracking-wide hover:text-[#7a2e15] transition-colors">
               Careers
             </Link>
-            <Link href="/fundraising" className="text-2xl text-[#451400] uppercase tracking-wide hover:text-[#7a2e15] transition-colors">
-              Fundraising
-            </Link>
             <Link href="/privacy" className="text-2xl text-[#451400] uppercase tracking-wide hover:text-[#7a2e15] transition-colors">
               Privacy Policy
+            </Link>
+            <Link href="/terms" className="text-2xl text-[#451400] uppercase tracking-wide hover:text-[#7a2e15] transition-colors">
+              Terms & Conditions
             </Link>
           </div>
 
@@ -55,8 +55,8 @@ export default function Footer() {
             <Link href="/locations" className="text-base font-bold text-[#451400] hover:underline">
               All Locations
             </Link>
-            <Link href="/disclosure" className="text-base font-bold text-[#451400] hover:underline">
-              Responsible Disclosure
+            <Link href="/fundraising" className="text-base font-bold text-[#451400] hover:underline">
+              Fundraising
             </Link>
           </div>
 

@@ -6,9 +6,11 @@ import { useState } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/backend/supabase";
+import { useToastStore } from "@/components/Toast";
 
 export default function SignInPage() {
   const router = useRouter();
+  const addToast = useToastStore((s) => s.addToast);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -55,6 +57,10 @@ export default function SignInPage() {
     }
 
     // Success - redirect to home
+    addToast({
+      name: "Welcome Back!",
+      description: "You have successfully signed in.",
+    });
     router.push("/");
     router.refresh(); // Refresh to update nav state
   };
