@@ -366,12 +366,14 @@ export default function Navbar() {
               </div>
 
               {/* Checkout Button */}
-              <button
-                className="w-full bg-[#a62116] hover:bg-[#851a11] text-white uppercase font-bold tracking-widest py-4 px-6 rounded-md transition-all duration-300 shadow-md"
+              <Link
+                href="/checkout"
+                onClick={closeCart}
+                className="block text-center w-full bg-[#a62116] hover:bg-[#851a11] text-white uppercase font-bold tracking-widest py-4 px-6 rounded-md transition-all duration-300 shadow-md"
                 style={{ fontFamily: "var(--font-bebas)", fontSize: "1.2rem" }}
               >
                 Checkout
-              </button>
+              </Link>
 
               {/* Clear Cart */}
               <button
