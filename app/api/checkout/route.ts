@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseServer } from "@/backend/supabaseServer";
+import { supabaseAdmin } from "@/backend/supabaseServer";
 
 export async function POST(req: Request) {
   try {
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const orderNumber = "ORD-" + Math.floor(100000 + Math.random() * 900000);
 
     // 2. Insert into Orders Table (using Service Role Key to bypass RLS)
-    const { data: order, error: orderError } = await supabaseServer
+    const { data: order, error: orderError } = await supabaseAdmin
       .from("orders")
       .insert([
         {
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
       image: item.image,
     }));
 
-    const { error: itemsError } = await supabaseServer
+    const { error: itemsError } = await supabaseAdmin
       .from("order_items")
       .insert(orderItems);
 
