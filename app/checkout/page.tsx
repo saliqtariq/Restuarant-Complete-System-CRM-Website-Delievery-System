@@ -150,11 +150,11 @@ export default function CheckoutPage() {
               <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1 md:col-span-2">
                   <label className="text-sm font-bold text-gray-700">Full Name</label>
-                  <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="John Doe" />
+                  <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="Saliq Tariq" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-bold text-gray-700">Phone Number</label>
-                  <input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="03XXXXXXXXX" />
+                  <input type="tel" required pattern="^03[0-9]{9}$" title="Phone number must start with 03 and be exactly 11 digits long" maxLength={11} value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="03XXXXXXXXX" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-bold text-gray-700">City</label>

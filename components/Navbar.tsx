@@ -7,11 +7,13 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/backend/supabase";
 import { useCartStore } from "@/lib/cartStore";
 import ProfileDrawer from "./ProfileDrawer";
+import LocationModal from "./LocationModal";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
 
   // Listen for custom event to open the drawer
@@ -98,10 +100,10 @@ export default function Navbar() {
         {/* Right section: Actions */}
         <div className="flex items-center space-x-4 lg:space-x-6 text-[#4a1c10] tracking-widest font-['Avenir_Next',_sans-serif] font-semibold text-sm whitespace-nowrap">
           {/* Find a location */}
-          <Link href="/locations" className="hidden lg:flex items-center hover:opacity-80 transition-opacity">
+          <button onClick={() => setLocationModalOpen(true)} className="hidden lg:flex items-center hover:opacity-80 transition-opacity">
             <Image src="/LocationPin Pic.png" alt="Location" width={36} height={36} className="object-contain" />
             <span className="pt-1 -ml-1">FIND ABRAHAM&apos;S TABLE</span>
-          </Link>
+          </button>
 
           {/* User / Sign In */}
           {user ? (
@@ -198,9 +200,9 @@ export default function Navbar() {
           <Link href="/download" onClick={closeMobile} className="py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors block">
             DOWNLOAD APP
           </Link>
-          <Link href="/locations" onClick={closeMobile} className="py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors block">
+          <button onClick={() => { setLocationModalOpen(true); closeMobile(); }} className="py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors text-left block w-full">
             FIND LOCATION
-          </Link>
+          </button>
           {user ? (
             <button onClick={() => { setProfileOpen(true); closeMobile(); }} className="py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors flex items-center gap-3 text-left w-full uppercase text-black font-bold text-xl tracking-widest" style={{ fontFamily: "var(--font-bebas)" }}>
               {user.user_metadata?.avatar_url ? (
@@ -393,6 +395,11 @@ export default function Navbar() {
         onClose={() => setProfileOpen(false)}
         user={user}
         handleSignOut={handleSignOut}
+      />
+
+      <LocationModal
+        isOpen={locationModalOpen}
+        onClose={() => setLocationModalOpen(false)}
       />
     </>
   );

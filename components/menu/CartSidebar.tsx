@@ -17,7 +17,7 @@ export default function CartSidebar() {
     <div className="w-full bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] flex flex-col overflow-hidden sticky top-[100px] max-h-[calc(100vh-120px)] border border-gray-100">
       
       {/* Header */}
-      <div className="pt-6 pb-4 px-6 border-b-2 border-[#e5002a] relative">
+      <div className="pt-6 pb-4 px-6 border-b-2 border-[#e5002a] relative shrink-0">
         <div className="flex gap-1 absolute right-4 top-4">
           <div className="w-4 h-4 bg-[#e5002a]"></div>
           <div className="w-4 h-4 bg-[#e5002a]"></div>
@@ -30,8 +30,8 @@ export default function CartSidebar() {
 
       {items.length === 0 ? (
         /* Empty State */
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-gray-50/50">
-          <div className="relative w-48 h-48 mb-6">
+        <div className="flex-1 overflow-y-auto min-h-0 flex flex-col items-center justify-center p-8 text-center bg-gray-50/50">
+          <div className="relative w-48 h-48 mb-6 shrink-0">
             <Image 
               src="/ChickenBucket.png" 
               alt="Empty Bucket" 
@@ -39,13 +39,13 @@ export default function CartSidebar() {
               className="object-contain opacity-80"
             />
           </div>
-          <h3 className="text-2xl uppercase text-[#111] font-bold tracking-wider" style={{ fontFamily: "var(--font-bebas)" }}>
+          <h3 className="text-2xl uppercase text-[#111] font-bold tracking-wider shrink-0" style={{ fontFamily: "var(--font-bebas)" }}>
             You haven't added any items in bucket yet
           </h3>
         </div>
       ) : (
         /* Items List */
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/30">
+        <div className="flex-1 overflow-y-auto min-h-0 p-4 space-y-4 bg-gray-50/30">
           {items.map((item) => (
             <div
               key={item.name}
@@ -115,7 +115,7 @@ export default function CartSidebar() {
       )}
 
       {/* Footer / Checkout Button */}
-      <div className="p-4 bg-white relative z-10">
+      <div className="p-4 bg-white relative z-10 shrink-0">
         <Link 
           href="/checkout"
           className="w-full bg-gradient-to-r from-[#e5002a] to-[#c40024] hover:from-[#c40024] hover:to-[#a0001d] text-white py-4 px-6 rounded-xl transition-all duration-300 shadow-md flex items-center justify-between group"

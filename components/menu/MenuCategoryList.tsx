@@ -146,7 +146,7 @@ export default function MenuCategoryList() {
       {/* Menu Sections and Cart Layout */}
       <div className="flex flex-col md:flex-row gap-8 relative items-start mt-6">
         {/* Left Side: Items */}
-        <div className="w-full md:w-[65%] xl:w-[70%] flex flex-col gap-16 px-2 md:px-0 pb-20">
+        <div className="flex-1 w-full flex flex-col gap-16 px-2 md:px-0 pb-20">
           {menuData.map((category) => (
             <div key={category.id} id={category.id} className="scroll-mt-[150px]">
             <h2 
@@ -235,7 +235,7 @@ export default function MenuCategoryList() {
         </div>
 
         {/* Right Side: Sticky Cart Sidebar */}
-        <div className="w-full md:w-[35%] xl:w-[30%] relative z-30">
+        <div className="w-full md:w-[320px] xl:w-[380px] shrink-0 relative z-30">
           <CartSidebar />
         </div>
       </div>
