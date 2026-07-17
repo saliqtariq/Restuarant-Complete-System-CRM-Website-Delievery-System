@@ -8,6 +8,9 @@ export interface CartItem {
 }
 
 interface CartState {
+  orderType: "delivery" | "pickup" | null;
+  locationDetails: string | null;
+  setLocation: (type: "delivery" | "pickup" | null, details: string | null) => void;
   items: CartItem[];
   addItem: (item: Omit<CartItem, "quantity">) => void;
   removeItem: (name: string) => void;
@@ -24,6 +27,9 @@ function parsePrice(priceStr: string): number {
 }
 
 export const useCartStore = create<CartState>((set, get) => ({
+  orderType: null,
+  locationDetails: null,
+  setLocation: (type, details) => set({ orderType: type, locationDetails: details }),
   items: [],
 
   addItem: (item) =>

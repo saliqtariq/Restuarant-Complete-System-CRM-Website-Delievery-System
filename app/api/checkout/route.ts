@@ -19,6 +19,7 @@ export async function POST(req: Request) {
       .insert([
         {
           order_number: orderNumber,
+          order_type: delivery.type || "delivery",
           customer_name: delivery.fullName,
           phone: delivery.phone,
           city: delivery.city,

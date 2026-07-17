@@ -46,6 +46,8 @@ export default function Navbar() {
   const clearCart = useCartStore((s) => s.clearCart);
   const totalItems = useCartStore((s) => s.totalItems);
   const totalPrice = useCartStore((s) => s.totalPrice);
+  const locationDetails = useCartStore((s) => s.locationDetails);
+  const orderType = useCartStore((s) => s.orderType);
 
   const closeMobile = () => setMobileOpen(false);
   const closeCart = () => setCartOpen(false);
@@ -100,9 +102,20 @@ export default function Navbar() {
         {/* Right section: Actions */}
         <div className="flex items-center space-x-4 lg:space-x-6 text-[#4a1c10] tracking-widest font-['Avenir_Next',_sans-serif] font-semibold text-sm whitespace-nowrap">
           {/* Find a location */}
-          <button onClick={() => setLocationModalOpen(true)} className="hidden lg:flex items-center hover:opacity-80 transition-opacity">
-            <Image src="/LocationPin Pic.png" alt="Location" width={36} height={36} className="object-contain" />
-            <span className="pt-1 -ml-1">FIND ABRAHAM&apos;S TABLE</span>
+          <button onClick={() => setLocationModalOpen(true)} className="hidden lg:flex items-center hover:opacity-80 transition-opacity max-w-[250px] xl:max-w-[300px] text-left">
+            <Image src="/LocationPin Pic.png" alt="Location" width={36} height={36} className="object-contain shrink-0" />
+            {locationDetails ? (
+              <div className="flex flex-col items-start justify-center ml-1 mt-1">
+                <span className="text-base font-bold leading-tight tracking-normal text-[#4a1c10] capitalize">
+                  {orderType === 'delivery' ? 'Delivery To' : 'Pickup From'}
+                </span>
+                <span className="text-sm font-normal truncate max-w-[160px] xl:max-w-[200px] leading-tight text-[#4a1c10] tracking-normal">
+                  {locationDetails}
+                </span>
+              </div>
+            ) : (
+              <span className="pt-1 -ml-1 truncate">FIND ABRAHAM&apos;S TABLE</span>
+            )}
           </button>
 
           {/* User / Sign In */}
@@ -200,8 +213,19 @@ export default function Navbar() {
           <Link href="/download" onClick={closeMobile} className="py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors block">
             DOWNLOAD APP
           </Link>
-          <button onClick={() => { setLocationModalOpen(true); closeMobile(); }} className="py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors text-left block w-full">
-            FIND LOCATION
+          <button onClick={() => { setLocationModalOpen(true); closeMobile(); }} className="py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors text-left block w-full truncate">
+            {locationDetails ? (
+              <div className="flex flex-col items-start justify-center">
+                <span className="text-base font-bold leading-tight tracking-normal capitalize">
+                  {orderType === 'delivery' ? 'Delivery To' : 'Pickup From'}
+                </span>
+                <span className="text-sm font-normal truncate max-w-full leading-tight tracking-normal mt-1">
+                  {locationDetails}
+                </span>
+              </div>
+            ) : (
+              "FIND LOCATION"
+            )}
           </button>
           {user ? (
             <button onClick={() => { setProfileOpen(true); closeMobile(); }} className="py-4 border-b border-gray-100 hover:text-[#9b1b1b] transition-colors flex items-center gap-3 text-left w-full uppercase text-black font-bold text-xl tracking-widest" style={{ fontFamily: "var(--font-bebas)" }}>

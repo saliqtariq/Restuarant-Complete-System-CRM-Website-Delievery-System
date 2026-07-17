@@ -1,15 +1,17 @@
 "use client";
 
 import { useCartStore } from "@/lib/cartStore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, CreditCard, Wallet, Banknote, CheckCircle2, ChevronRight, Loader2 } from "lucide-react";
+import { ArrowLeft, CreditCard, Wallet, Banknote, CheckCircle2, ChevronRight, Loader2, Store } from "lucide-react";
 
 export default function CheckoutPage() {
   const items = useCartStore((s) => s.items);
   const totalPrice = useCartStore((s) => s.totalPrice);
   const clearCart = useCartStore((s) => s.clearCart);
+  const orderType = useCartStore((s) => s.orderType);
+  const locationDetails = useCartStore((s) => s.locationDetails);
 
   const [paymentMethod, setPaymentMethod] = useState<"cod">("cod");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,6 +28,14 @@ export default function CheckoutPage() {
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
 
+  // Pre-fill address if delivery location is set
+  useEffect(() => {
+    if (orderType === "delivery" && locationDetails) {
+      setAddress(locationDetails);
+      setCity("Lahore"); // Defaulting to Lahore as per the map
+    }
+  }, [orderType, locationDetails]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -39,15 +49,16 @@ export default function CheckoutPage() {
           delivery: {
             fullName,
             phone,
-            city,
-            address,
-            paymentMethod: "cod"
+            city: orderType === "pickup" ? "N/A" : city,
+            address: orderType === "pickup" ? locationDetails || "Pickup" : address,
+            paymentMethod: "cod",
+            type: orderType || "delivery",
           },
           financials: {
             subtotal,
-            deliveryFee,
+            deliveryFee: orderType === "pickup" ? 0 : deliveryFee,
             gst,
-            grandTotal
+            grandTotal: subtotal + (orderType === "pickup" ? 0 : deliveryFee) + gst
           }
         }),
       });
@@ -142,28 +153,46 @@ export default function CheckoutPage() {
 
             {/* Delivery Details */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-5 border-b border-gray-100 bg-gray-50/50">
+              <div className="p-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
                 <h2 className="text-2xl text-black uppercase m-0" style={{ fontFamily: "var(--font-bebas)" }}>
-                  Delivery Details
+                  {orderType === "pickup" ? "Pickup Details" : "Delivery Details"}
                 </h2>
+                {orderType && (
+                  <span className="bg-[#451400] text-white text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+                    {orderType}
+                  </span>
+                )}
               </div>
               <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {orderType === "pickup" && locationDetails && (
+                  <div className="md:col-span-2 bg-gray-50 border border-gray-200 rounded-lg p-4 mb-2 flex items-start gap-3">
+                    <Store className="text-[#451400] shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-gray-900 uppercase tracking-widest text-sm">Picking up from:</h4>
+                      <p className="text-gray-700 text-lg">{locationDetails}</p>
+                    </div>
+                  </div>
+                )}
                 <div className="space-y-1 md:col-span-2">
                   <label className="text-sm font-bold text-gray-700">Full Name</label>
                   <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="Saliq Tariq" />
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1 md:col-span-2">
                   <label className="text-sm font-bold text-gray-700">Phone Number</label>
                   <input type="tel" required pattern="^03[0-9]{9}$" title="Phone number must start with 03 and be exactly 11 digits long" maxLength={11} value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="03XXXXXXXXX" />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-sm font-bold text-gray-700">City</label>
-                  <input type="text" required value={city} onChange={(e) => setCity(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="Lahore" />
-                </div>
-                <div className="space-y-1 md:col-span-2">
-                  <label className="text-sm font-bold text-gray-700">Full Address</label>
-                  <textarea required rows={3} value={address} onChange={(e) => setAddress(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="House #, Street, Area..."></textarea>
-                </div>
+                {orderType !== "pickup" && (
+                  <>
+                    <div className="space-y-1 md:col-span-2">
+                      <label className="text-sm font-bold text-gray-700">City</label>
+                      <input type="text" required value={city} onChange={(e) => setCity(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="Lahore" />
+                    </div>
+                    <div className="space-y-1 md:col-span-2">
+                      <label className="text-sm font-bold text-gray-700">Full Address</label>
+                      <textarea required rows={3} value={address} onChange={(e) => setAddress(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2.5 focus:outline-none focus:border-[#e5002a] focus:ring-1 focus:ring-[#e5002a]" placeholder="House #, Street, Area..."></textarea>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -196,10 +225,12 @@ export default function CheckoutPage() {
                   <span>Subtotal</span>
                   <span className="font-medium text-black">RS {subtotal.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Delivery Fee</span>
-                  <span className="font-medium text-black">RS {deliveryFee.toLocaleString()}</span>
-                </div>
+                {orderType !== "pickup" && (
+                  <div className="flex justify-between text-gray-600">
+                    <span>Delivery Fee</span>
+                    <span className="font-medium text-black">RS {deliveryFee.toLocaleString()}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-gray-600">
                   <span>GST (16%)</span>
                   <span className="font-medium text-black">RS {Math.round(gst).toLocaleString()}</span>
@@ -209,7 +240,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between items-end mb-6">
                   <span className="text-lg font-bold text-gray-900 uppercase tracking-wide">Total</span>
                   <span className="text-3xl font-bold text-[#e5002a]" style={{ fontFamily: "var(--font-bebas)" }}>
-                    RS {Math.round(grandTotal).toLocaleString()}
+                    RS {Math.round(subtotal + (orderType === "pickup" ? 0 : deliveryFee) + gst).toLocaleString()}
                   </span>
                 </div>
                 <button
