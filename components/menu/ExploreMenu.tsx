@@ -5,12 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 const categories = [
-  { name: "Everyday Value", image: "/EveryDayValue.png" },
   { name: "LA Carta & Combos", image: "/Lacartacombo.png" },
-  { name: "Signature-Boxes", image: "/Signature box transparent.png" },
-  { name: "Spreads", image: "/SNACKtransparent.png" },
+  { name: "Signature Boxes", image: "/Signature box transparent.png" },
   { name: "Snacks & Beverages", image: "/Snack & Beverages.png" },
-  { name: "Sharing", image: "/Sharing.png" },
+  { name: "Condiments", image: "/SNACKtransparent.png" },
+  { name: "Everyday Value", image: "/EveryDayValue.png" },
 ];
 
 export default function ExploreMenu() {
@@ -94,8 +93,9 @@ export default function ExploreMenu() {
                     src={cat.image}
                     alt={cat.name}
                     fill
-                    sizes="220px"
+                    sizes="(max-width: 768px) 220px, 280px"
                     className="object-contain mix-blend-multiply drop-shadow-sm"
+                    loading="lazy"
                   />
                 </div>
 

@@ -123,10 +123,23 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Prevent 300ms tap delay on mobile */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   html {
     @apply font-sans;
     scroll-behavior: smooth;
+    /* Smooth scrolling for all browsers */
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Speed up image rendering */
+  img {
+    image-rendering: -webkit-optimize-contrast;
+  }
+  /* Prevent layout shift from images */
+  img, video {
+    height: auto;
   }
 }
 

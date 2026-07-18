@@ -2,8 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { FeedbackForm } from './FeedbackForm';
-
 const Facebook = ({ size = 24 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
@@ -28,7 +26,7 @@ export default function Footer() {
   return (
     <footer className="w-full bg-white text-[#3E2b2f] pt-16 pb-8 border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 items-start">
           {/* Column 1 - Main Links */}
           <div className="self-start flex flex-col space-y-3" style={{ fontFamily: 'var(--font-anton)' }}>
             <Link href="/contact" className="text-2xl text-[#451400] uppercase tracking-wide hover:text-[#7a2e15] transition-colors">
@@ -64,12 +62,7 @@ export default function Footer() {
             </Link>
           </div>
 
-          {/* Column 3 - Feedback Form */}
-          <div className="self-start w-full">
-            <FeedbackForm />
-          </div>
-
-          {/* Column 4 - Join Promo */}
+          {/* Column 3 - Join Promo */}
           <div className="self-start w-full flex flex-col items-center justify-center md:-mt-3 md:items-end">
             <div className="flex w-[168px] flex-col items-center text-center">
               {/* Logo */}

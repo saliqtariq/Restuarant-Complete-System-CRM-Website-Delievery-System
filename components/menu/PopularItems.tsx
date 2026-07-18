@@ -93,9 +93,10 @@ export default function PopularItems() {
                   src={item.image}
                   alt={item.name}
                   fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  sizes="(max-width: 640px) 90vw, (max-width: 768px) 45vw, (max-width: 1024px) 45vw, 22vw"
                   className="object-contain transition-transform duration-300 group-hover:scale-105"
-                  priority
+                  priority={popularItems.indexOf(item) === 0}
+                  loading={popularItems.indexOf(item) === 0 ? "eager" : "lazy"}
                 />
               </div>
               <h3 

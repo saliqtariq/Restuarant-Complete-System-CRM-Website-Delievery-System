@@ -19,24 +19,30 @@ import {
   LogOut,
 } from "lucide-react";
 
-
-const navItems = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, badge: null },
-  { name: "Orders", href: "/dashboard/orders", icon: ClipboardList, badge: 18 },
-  { name: "Pickup Orders", href: "/dashboard/pickup", icon: ShoppingBag, badge: 15 },
-  { name: "Delivery Orders", href: "/dashboard/delivery", icon: Truck, badge: 32 },
-  { name: "Payments", href: "/dashboard/payments", icon: CreditCard, badge: null },
-  { name: "Delivery Drivers Management", href: "/dashboard/drivers", icon: MapPin, badge: null },
-  { name: "Coupons & Offers", href: "/dashboard/coupons", icon: Tag, badge: null },
-  { name: "Customers", href: "/dashboard/customers", icon: Users, badge: null },
-  { name: "Menu Management", href: "/dashboard/menu", icon: MenuSquare, badge: null },
-  { name: "Reviews", href: "/dashboard/reviews", icon: Star, badge: null },
-  { name: "Reports & Analytics", href: "/dashboard/reports", icon: BarChart3, badge: null },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings, badge: null },
-];
-
-export function Sidebar() {
+type SidebarProps = {
+  counts?: {
+    orders: number;
+    pickup: number;
+    delivery: number;
+  };
+};
+export function Sidebar({ counts }: SidebarProps) {
   const pathname = usePathname();
+
+  const navItems = [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, badge: null },
+    { name: "Orders", href: "/dashboard/orders", icon: ClipboardList, badge: counts?.orders ? counts.orders : null },
+    { name: "Pickup Orders", href: "/dashboard/pickup", icon: ShoppingBag, badge: counts?.pickup ? counts.pickup : null },
+    { name: "Delivery Orders", href: "/dashboard/delivery", icon: Truck, badge: counts?.delivery ? counts.delivery : null },
+    { name: "Payments", href: "/dashboard/payments", icon: CreditCard, badge: null },
+    { name: "Delivery Drivers Management", href: "/dashboard/drivers", icon: MapPin, badge: null },
+    { name: "Coupons & Offers", href: "/dashboard/coupons", icon: Tag, badge: null },
+    { name: "Customers", href: "/dashboard/customers", icon: Users, badge: null },
+    { name: "Menu Management", href: "/dashboard/menu", icon: MenuSquare, badge: null },
+    { name: "Reviews", href: "/dashboard/reviews", icon: Star, badge: null },
+    { name: "Reports & Analytics", href: "/dashboard/reports", icon: BarChart3, badge: null },
+    { name: "Settings", href: "/dashboard/settings", icon: Settings, badge: null },
+  ];
 
   return (
     <aside className="w-[220px] shrink-0 bg-[#3B0A0A] text-white flex flex-col h-screen sticky top-0 overflow-y-auto">

@@ -10,13 +10,12 @@ export default function HeroSection() {
         muted
         loop
         playsInline
-        preload="auto"
+        preload="none"
+        poster="/Mainlogo.png"
         className="absolute inset-0 w-full h-full object-cover"
         style={{
           willChange: "transform",
-          backfaceVisibility: "hidden",
-          WebkitBackfaceVisibility: "hidden",
-          imageRendering: "auto",
+          contain: "paint",
           transform: "translateZ(0)",
         }}
       >

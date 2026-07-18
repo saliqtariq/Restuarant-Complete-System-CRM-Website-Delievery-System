@@ -1,11 +1,12 @@
 import { ShoppingBag, Truck, ChefHat, CheckSquare } from "lucide-react";
+import type { OrderStatusCounts, PickupQueueItem } from "@/app/actions/dashboard";
 
-export function OrderStatusWidget() {
+export function OrderStatusWidget({ counts }: { counts: OrderStatusCounts }) {
   const statuses = [
-    { label: "Pickup Orders", sub: "Waiting for customer", count: 15, icon: ShoppingBag, color: "text-orange-500", bg: "bg-orange-50" },
-    { label: "Delivery Orders", sub: "Out for delivery", count: 32, icon: Truck, color: "text-green-500", bg: "bg-green-50" },
-    { label: "Preparing in Kitchen", sub: "In progress", count: 9, icon: ChefHat, color: "text-orange-500", bg: "bg-orange-50" },
-    { label: "Completed Orders", sub: "Delivered / Picked up", count: 71, icon: CheckSquare, color: "text-green-500", bg: "bg-green-50" },
+    { label: "Pickup Orders", sub: "Waiting for customer", count: counts.pickup, icon: ShoppingBag, color: "text-orange-500", bg: "bg-orange-50" },
+    { label: "Delivery Orders", sub: "Out for delivery", count: counts.delivery, icon: Truck, color: "text-green-500", bg: "bg-green-50" },
+    { label: "Preparing in Kitchen", sub: "In progress", count: counts.preparing, icon: ChefHat, color: "text-orange-500", bg: "bg-orange-50" },
+    { label: "Completed Orders", sub: "Delivered / Picked up", count: counts.completed, icon: CheckSquare, color: "text-green-500", bg: "bg-green-50" },
   ];
 
   return (
@@ -34,52 +35,52 @@ export function OrderStatusWidget() {
   );
 }
 
-export function PickupQueueWidget() {
-  const queue = [
-    { id: "#1045", name: "Ahmed Raza", status: "Ready for Pickup", dot: "bg-green-500", action: "Mark Picked Up", type: "primary" },
-    { id: "#1048", name: "Usman Ali", status: "Ready for Pickup", dot: "bg-green-500", action: "Mark Picked Up", type: "primary" },
-    { id: "#1051", name: "Faisal Khan", status: "Preparing", dot: "bg-orange-500", action: "Preparing", type: "secondary" },
-  ];
-
+export function PickupQueueWidget({ queue }: { queue: PickupQueueItem[] }) {
   return (
     <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-bold text-gray-900 text-[11px] uppercase tracking-wider">PICKUP QUEUE</h3>
         <button className="text-[#E63946] text-[10px] font-bold hover:underline">View All</button>
       </div>
-      <div className="space-y-3">
-        {queue.map((q, i) => (
-          <div key={i} className="pb-3 border-b border-gray-50 last:border-0 last:pb-0">
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-gray-900 text-[12px]">{q.id}</span>
-                <span className="font-semibold text-gray-700 text-[12px]">{q.name}</span>
-                <span className="text-[9px] bg-green-100 text-green-700 font-bold px-1.5 py-0.5 rounded">PAID</span>
+      {queue.length === 0 ? (
+        <div className="text-xs text-gray-500 text-center py-4 font-medium">No pending pickups</div>
+      ) : (
+        <div className="space-y-3">
+          {queue.map((q, i) => (
+            <div key={i} className="pb-3 border-b border-gray-50 last:border-0 last:pb-0">
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-gray-900 text-[12px]">{q.order_number}</span>
+                  <span className="font-semibold text-gray-700 text-[12px] max-w-[80px] truncate">{q.customer_name}</span>
+                  {q.payment_method !== "cod" && (
+                    <span className="text-[9px] bg-green-100 text-green-700 font-bold px-1.5 py-0.5 rounded">PAID</span>
+                  )}
+                </div>
+                <button className={`text-[10px] font-bold px-2.5 py-1 rounded transition-colors ${
+                  q.status === "ready"
+                    ? "border border-[#E63946] text-[#E63946] hover:bg-red-50"
+                    : "border border-orange-300 text-orange-500 bg-orange-50"
+                }`}>
+                  {q.status === "ready" ? "Mark Picked Up" : "Preparing"}
+                </button>
               </div>
-              <button className={`text-[10px] font-bold px-2.5 py-1 rounded transition-colors ${
-                q.type === "primary"
-                  ? "border border-[#E63946] text-[#E63946] hover:bg-red-50"
-                  : "border border-orange-300 text-orange-500 bg-orange-50"
-              }`}>
-                {q.action}
-              </button>
+              <div className="flex items-center gap-1.5 text-[10px] text-gray-500 pl-0.5 uppercase font-medium">
+                <span className={`w-1.5 h-1.5 rounded-full ${q.status === "ready" ? "bg-green-500" : "bg-orange-500"}`}></span>
+                {q.status}
+              </div>
             </div>
-            <div className="flex items-center gap-1.5 text-[10px] text-gray-500 pl-0.5">
-              <span className={`w-1.5 h-1.5 rounded-full ${q.dot}`}></span>
-              {q.status}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 export function DeliveryDriversWidget() {
   const drivers = [
-    { name: "Ali Khan", orders: "4 Active Orders", eta: "ETA 12 min", loc: "Johar Town", locGreen: false },
-    { name: "Usman Javaid", orders: "3 Active Orders", eta: "ETA 18 min", loc: "DHA Phase 5", locGreen: true },
-    { name: "Hamza Qureshi", orders: "2 Active Orders", eta: "ETA 25 min", loc: "Model Town", locGreen: true },
+    { name: "Ali Khan", orders: "0 Active Orders", eta: "Offline", loc: "-", locGreen: false },
+    { name: "Usman Javaid", orders: "0 Active Orders", eta: "Offline", loc: "-", locGreen: false },
+    { name: "Hamza Qureshi", orders: "0 Active Orders", eta: "Offline", loc: "-", locGreen: false },
   ];
 
   return (
@@ -88,7 +89,7 @@ export function DeliveryDriversWidget() {
         <h3 className="font-bold text-gray-900 text-[11px] uppercase tracking-wider">DELIVERY DRIVERS</h3>
         <button className="text-[#E63946] text-[10px] font-bold hover:underline">View All</button>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-4 opacity-50">
         {drivers.map((d, i) => (
           <div key={i} className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -111,11 +112,11 @@ export function DeliveryDriversWidget() {
   );
 }
 
-export function RightSidebarWidgets() {
+export function RightSidebarWidgets({ statusCounts, pickupQueue }: { statusCounts: OrderStatusCounts; pickupQueue: PickupQueueItem[] }) {
   return (
     <div className="flex flex-col gap-4 w-full xl:w-[300px] shrink-0">
-      <OrderStatusWidget />
-      <PickupQueueWidget />
+      <OrderStatusWidget counts={statusCounts} />
+      <PickupQueueWidget queue={pickupQueue} />
       <DeliveryDriversWidget />
     </div>
   );

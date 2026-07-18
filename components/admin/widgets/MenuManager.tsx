@@ -15,6 +15,22 @@ import {
 } from "@/app/actions/menu";
 import { Plus, Trash2, Pencil, Power, ChevronDown, ChevronRight } from "lucide-react";
 
+// ─── Image URL normalizer ────────────────────────────────────────────────────
+// Accepts paths like "public/beef.png", "beef.png", "/beef.png",
+// or full https:// URLs — always returns a valid src for next/image.
+function normalizeImageUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  // Already an absolute URL or a root-relative path — use as-is
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/")) {
+    return trimmed;
+  }
+  // Strip leading "public/" if the user typed the folder name
+  const withoutPublic = trimmed.startsWith("public/") ? trimmed.slice("public".length) : "/" + trimmed;
+  return withoutPublic;
+}
+
 // ─── Category Form ────────────────────────────────────────────────────────────
 
 function CategoryForm({
@@ -351,10 +367,10 @@ export function MenuManager({ initialCategories, initialItems }: Props) {
                           >
                             {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                           </button>
-                          {cat.image_url && (
+                          {normalizeImageUrl(cat.image_url) && (
                             <div className="w-10 h-10 relative rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                               <Image
-                                src={cat.image_url}
+                                src={normalizeImageUrl(cat.image_url)!}
                                 alt={cat.name}
                                 fill
                                 className="object-cover"
@@ -425,10 +441,10 @@ export function MenuManager({ initialCategories, initialItems }: Props) {
                                   className="flex items-center justify-between px-5 py-3 hover:bg-gray-50/50"
                                 >
                                   <div className="flex items-center gap-3">
-                                    {item.image_url && (
+                                    {normalizeImageUrl(item.image_url) && (
                                       <div className="w-9 h-9 relative rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                                         <Image
-                                          src={item.image_url}
+                                          src={normalizeImageUrl(item.image_url)!}
                                           alt={item.name}
                                           fill
                                           className="object-cover"
@@ -533,9 +549,9 @@ export function MenuManager({ initialCategories, initialItems }: Props) {
                       <tr key={item.id} className="hover:bg-gray-50/50">
                         <td className="px-5 py-3">
                           <div className="flex items-center gap-3">
-                            {item.image_url && (
+                            {normalizeImageUrl(item.image_url) && (
                               <div className="w-9 h-9 relative rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                                <Image src={item.image_url} alt={item.name} fill className="object-cover" />
+                                <Image src={normalizeImageUrl(item.image_url)!} alt={item.name} fill className="object-cover" />
                               </div>
                             )}
                             <div>

@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS orders (
   gst NUMERIC NOT NULL,
   grand_total NUMERIC NOT NULL,
   
+  
   -- Status
   order_type TEXT NOT NULL DEFAULT 'delivery', -- 'pickup' or 'delivery'
   payment_method TEXT NOT NULL, -- 'cod', 'easypaisa', 'jazzcash', 'card', etc.

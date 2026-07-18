@@ -4,7 +4,15 @@ import { useState } from "react";
 import { OrderRow } from "@/app/actions/dashboard";
 import { OrderDetailsModal } from "./OrderDetailsModal";
 
-export function LiveOrdersTable({ orders }: { orders: OrderRow[] }) {
+export function LiveOrdersTable({ 
+  orders, 
+  title = "LIVE ORDERS", 
+  hideViewAll = false 
+}: { 
+  orders: OrderRow[];
+  title?: string;
+  hideViewAll?: boolean;
+}) {
   const [selectedOrder, setSelectedOrder] = useState<OrderRow | null>(null);
 
   const getStatusDisplay = (status: string, orderType: string) => {
@@ -29,8 +37,10 @@ export function LiveOrdersTable({ orders }: { orders: OrderRow[] }) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex-1">
       <div className="flex justify-between items-center px-5 py-4 border-b border-gray-100">
-        <h3 className="font-bold text-gray-900 text-sm tracking-wide">LIVE ORDERS</h3>
-        <button className="text-[#E63946] text-xs font-bold hover:underline">View All Orders</button>
+        <h3 className="font-bold text-gray-900 text-sm tracking-wide uppercase">{title}</h3>
+        {!hideViewAll && (
+          <button className="text-[#E63946] text-xs font-bold hover:underline">View All Orders</button>
+        )}
       </div>
 
       <div className="overflow-x-auto">
