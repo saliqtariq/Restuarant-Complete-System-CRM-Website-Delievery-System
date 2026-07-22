@@ -18,11 +18,15 @@ interface MapComponentProps {
   position: [number, number];
 }
 
-// Component to recenter map when position changes
+// Component to recenter map and invalidate size when position changes or modal opens
 function RecenterAutomatically({ position }: { position: [number, number] }) {
   const map = useMap();
   useEffect(() => {
     map.setView(position, 14);
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 200);
+    return () => clearTimeout(timer);
   }, [position, map]);
   return null;
 }
@@ -31,14 +35,14 @@ export default function MapComponent({ position }: MapComponentProps) {
   return (
     <MapContainer
       center={position}
-      zoom={13}
+      zoom={14}
       scrollWheelZoom={true}
       style={{ height: "100%", width: "100%", borderRadius: "0.5rem" }}
       className="z-0"
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
       />
       <Marker position={position} icon={icon} />
       <RecenterAutomatically position={position} />

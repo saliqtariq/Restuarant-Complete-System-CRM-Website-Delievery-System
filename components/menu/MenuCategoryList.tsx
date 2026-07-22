@@ -7,6 +7,13 @@ import { useState, useRef, useEffect } from "react";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import CartSidebar from "./CartSidebar";
 
+type MenuItem = {
+  name: string;
+  price: string;
+  image: string;
+  serves: string;
+};
+
 // Dummy Data
 export const menuData = [
   {
@@ -31,12 +38,19 @@ export const menuData = [
     title: "Snacks & Beverages",
     items: [
       { name: "Crispy Chicken Bucket", price: "RS 1750", image: "/ChickenBucket.png", serves: "Serves 2-3 persons" },
+      { name: "7Up Regular", price: "RS 180", image: "/7upRegularWithoutBG.png", serves: "Refreshing 345ml drink" },
+      { name: "Pepsi Regular", price: "RS 180", image: "/PepsiRegularnoBg.png", serves: "Chilled 345ml drink" },
+      { name: "Regular Fries", price: "RS 250", image: "/RegularFries.png", serves: "Crispy golden salted fries" },
     ]
   },
   {
     id: "condiments",
     title: "Condiments",
-    items: []
+    items: [
+      { name: "Creamy Ranch", price: "RS 90", image: "/creamyranch.png", serves: "Rich & creamy dip sauce" },
+      { name: "Garlic Sauce", price: "RS 90", image: "/GarliSauce.png", serves: "Signature garlic dip" },
+      { name: "Buffalo Sauce", price: "RS 90", image: "/BuffaloSauce.png", serves: "Tangy & spicy buffalo dip" },
+    ]
   },
   {
     id: "everyday-value",
@@ -91,7 +105,7 @@ export default function MenuCategoryList() {
     }
   };
 
-  const handleIncrease = (item: any, cartItem?: { quantity: number }) => {
+  const handleIncrease = (item: MenuItem, cartItem?: { quantity: number }) => {
     const currentCount = clickCountsRef.current[item.name] || 0;
     if (currentCount >= 2) return;
 

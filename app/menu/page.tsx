@@ -1,5 +1,4 @@
 import MenuCategoryList from "@/components/menu/MenuCategoryList";
-import CartSidebar from "@/components/menu/CartSidebar";
 
 export const metadata = {
   title: "Menu | Abraham's Table",

@@ -4,7 +4,7 @@ import { useCartStore } from "@/lib/cartStore";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, CreditCard, Wallet, Banknote, CheckCircle2, ChevronRight, Loader2, Store } from "lucide-react";
+import { ArrowLeft, Banknote, CheckCircle2, ChevronRight, Loader2, Store } from "lucide-react";
 
 export default function CheckoutPage() {
   const items = useCartStore((s) => s.items);
@@ -13,7 +13,6 @@ export default function CheckoutPage() {
   const orderType = useCartStore((s) => s.orderType);
   const locationDetails = useCartStore((s) => s.locationDetails);
 
-  const [paymentMethod, setPaymentMethod] = useState<"cod">("cod");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
@@ -21,7 +20,6 @@ export default function CheckoutPage() {
   const subtotal = totalPrice();
   const deliveryFee = subtotal > 0 ? 150 : 0;
   const gst = subtotal * 0.16; // 16% GST
-  const grandTotal = subtotal + deliveryFee + gst;
 
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -30,10 +28,13 @@ export default function CheckoutPage() {
 
   // Pre-fill address if delivery location is set
   useEffect(() => {
-    if (orderType === "delivery" && locationDetails) {
+    const id = window.setTimeout(() => {
+      if (orderType !== "delivery" || !locationDetails) return;
       setAddress(locationDetails);
       setCity("Lahore"); // Defaulting to Lahore as per the map
-    }
+    }, 0);
+
+    return () => window.clearTimeout(id);
   }, [orderType, locationDetails]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,12 +55,6 @@ export default function CheckoutPage() {
             paymentMethod: "cod",
             type: orderType || "delivery",
           },
-          financials: {
-            subtotal,
-            deliveryFee: orderType === "pickup" ? 0 : deliveryFee,
-            gst,
-            grandTotal: subtotal + (orderType === "pickup" ? 0 : deliveryFee) + gst
-          }
         }),
       });
 
@@ -89,7 +84,7 @@ export default function CheckoutPage() {
             Order Confirmed!
           </h1>
           <p className="text-gray-600 mb-8">
-            Thank you for your order. Your order number is <strong className="text-black">{orderNumber}</strong>. We'll send you an email confirmation shortly.
+            Thank you for your order. Your order number is <strong className="text-black">{orderNumber}</strong>. We&apos;ll send you an email confirmation shortly.
           </p>
           <Link
             href="/menu"

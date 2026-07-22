@@ -12,7 +12,7 @@ export function OrderStatusWidget({ counts }: { counts: OrderStatusCounts }) {
   return (
     <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-bold text-gray-900 text-[11px] uppercase tracking-wider">TODAY'S ORDER STATUS</h3>
+        <h3 className="font-bold text-gray-900 text-[11px] uppercase tracking-wider">TODAY&apos;S ORDER STATUS</h3>
         <button className="text-[#E63946] text-[10px] font-bold hover:underline">View Report</button>
       </div>
       <div className="space-y-4">

@@ -11,11 +11,22 @@ export default function DeliveryManagementPage() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    setLoading(true);
-    getDriversByBranch(selectedBranch)
-      .then((data) => setDrivers(data))
+    let active = true;
+
+    void getDriversByBranch(selectedBranch)
+      .then((data) => {
+        if (!active) return;
+        setDrivers(data);
+      })
       .catch((err) => console.error("Error fetching drivers:", err))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+      setLoading(true);
+    };
   }, [selectedBranch]);
 
   return (

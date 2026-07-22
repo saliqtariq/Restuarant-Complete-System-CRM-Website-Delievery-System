@@ -1,6 +1,7 @@
 "use server";
 
 import { supabaseAdmin } from "@/backend/supabaseServer";
+import { requireAdmin } from "@/lib/auth/admin";
 import { revalidatePath } from "next/cache";
 
 export type CouponRow = {
@@ -15,6 +16,7 @@ export type CouponRow = {
 };
 
 export async function getCoupons(): Promise<CouponRow[]> {
+  await requireAdmin();
   const { data, error } = await supabaseAdmin
     .from("coupons")
     .select("*")
@@ -30,6 +32,7 @@ export async function getCoupons(): Promise<CouponRow[]> {
 export async function createCoupon(
   couponData: Omit<CouponRow, "id" | "created_at">
 ): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
   const { error } = await supabaseAdmin.from("coupons").insert([couponData]);
 
   if (error) {
@@ -45,6 +48,7 @@ export async function toggleCouponStatus(
   id: string,
   isActive: boolean
 ): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
   const { error } = await supabaseAdmin
     .from("coupons")
     .update({ is_active: isActive })
@@ -62,6 +66,7 @@ export async function toggleCouponStatus(
 export async function deleteCoupon(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
   const { error } = await supabaseAdmin
     .from("coupons")
     .delete()

@@ -111,5 +111,10 @@ CREATE POLICY "Anyone can view menu items" ON menu_items FOR SELECT USING (true)
 -- Public policy for inserting reviews (anyone can leave a suggestion)
 CREATE POLICY "Anyone can insert a review" ON reviews FOR INSERT WITH CHECK (true);
 
+-- Lock down email verification codes (service role only)
+ALTER TABLE email_verifications ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON email_verifications FROM anon, authenticated;
+GRANT ALL ON email_verifications TO service_role;
+
 -- Service role bypasses RLS, so the Next.js backend (using SUPABASE_SERVICE_ROLE_KEY)
 -- can securely insert orders/menu items into these tables without needing RLS insert policies here.

@@ -1,27 +1,31 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import {
+  ADMIN_SESSION_COOKIE,
+  verifyAdminSessionToken,
+} from "@/lib/auth/admin";
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
 
-  // Protect the dashboard routes
-  if (url.pathname.startsWith('/dashboard')) {
-    const hasAdminSession = req.cookies.has('admin_session');
+  if (url.pathname.startsWith("/dashboard")) {
+    const token = req.cookies.get(ADMIN_SESSION_COOKIE)?.value;
+    const isAuthenticated = token ? await verifyAdminSessionToken(token) : false;
 
-    if (!hasAdminSession) {
-      // Redirect to custom login page
-      return NextResponse.redirect(new URL('/admin/login', req.url));
+    if (!isAuthenticated) {
+      const response = NextResponse.redirect(new URL("/admin/login", req.url));
+      response.cookies.delete(ADMIN_SESSION_COOKIE);
+      return response;
     }
   }
 
-  // Redirect /admin directly to /admin/login for convenience
-  if (url.pathname === '/admin') {
-    return NextResponse.redirect(new URL('/admin/login', req.url));
+  if (url.pathname === "/admin") {
+    return NextResponse.redirect(new URL("/admin/login", req.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/admin'],
+  matcher: ["/dashboard/:path*", "/admin"],
 };

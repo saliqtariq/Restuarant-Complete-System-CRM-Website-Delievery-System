@@ -1,36 +1,82 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/backend/supabaseServer";
+import { calculateOrderTotals } from "@/lib/checkout/pricing";
+import { getClientIp, rateLimit } from "@/lib/security/rateLimit";
+import { isBodyParsingError, readJsonBody } from "@/lib/security/request";
+import { isValidPhone, normalizeText } from "@/lib/security/validation";
+import { randomInt } from "crypto";
+import { z } from "zod";
+
+const checkoutSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        name: z.string().trim().min(1).max(100),
+        price: z.string().max(50).optional().default(""),
+        image: z.string().max(300).optional().default(""),
+        quantity: z.number().int().min(1).max(20),
+      })
+    )
+    .min(1)
+    .max(30),
+  delivery: z.object({
+    type: z.enum(["pickup", "delivery"]).optional().default("delivery"),
+    fullName: z.string().trim().min(2).max(80),
+    phone: z.string().trim().min(7).max(20),
+    city: z.string().trim().max(80).optional().default("N/A"),
+    address: z.string().trim().max(250).optional().default("N/A"),
+    paymentMethod: z
+      .enum(["cod", "easypaisa", "jazzcash", "card"])
+      .optional()
+      .default("cod"),
+  }),
+});
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { items, delivery, financials } = body;
-
-    if (!items || items.length === 0) {
-      return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
+    const ip = getClientIp(req.headers);
+    const limited = await rateLimit(`checkout:${ip}`, 8, 10 * 60 * 1000);
+    if (limited.limited) {
+      return NextResponse.json(
+        { error: "Too many checkout attempts. Please try again later." },
+        { status: 429, headers: { "Retry-After": String(limited.retryAfter) } }
+      );
     }
 
-    // 1. Generate Order Number
-    const orderNumber = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+    const body = await readJsonBody<unknown>(req, 30_000);
+    const parsed = checkoutSchema.safeParse(body);
 
-    // 2. Insert into Orders Table (using Service Role Key to bypass RLS)
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid checkout details" }, { status: 400 });
+    }
+
+    const { items, delivery } = parsed.data;
+
+    if (!isValidPhone(delivery.phone)) {
+      return NextResponse.json({ error: "Invalid phone number" }, { status: 400 });
+    }
+
+    const orderType = delivery.type === "pickup" ? "pickup" : "delivery";
+    const totals = await calculateOrderTotals(items, orderType);
+
+    const orderNumber = `ORD-${randomInt(100000, 1000000)}`;
+
     const { data: order, error: orderError } = await supabaseAdmin
       .from("orders")
       .insert([
         {
           order_number: orderNumber,
-          order_type: delivery.type || "delivery",
-          customer_name: delivery.fullName,
-          phone: delivery.phone,
-          city: delivery.city,
-          delivery_address: delivery.address,
-          subtotal: financials.subtotal,
-          delivery_fee: financials.deliveryFee,
-          gst: financials.gst,
-          grand_total: financials.grandTotal,
-          payment_method: delivery.paymentMethod || "cod",
+          order_type: orderType,
+          customer_name: normalizeText(delivery.fullName, 80),
+          phone: normalizeText(delivery.phone, 20),
+          city: normalizeText(delivery.city || "N/A", 80),
+          delivery_address: normalizeText(delivery.address || "N/A", 250),
+          subtotal: totals.subtotal,
+          delivery_fee: totals.deliveryFee,
+          gst: totals.gst,
+          grand_total: totals.grandTotal,
+          payment_method: delivery.paymentMethod,
           status: "pending",
-          // user_id: we would extract this from an Auth token if the user is signed in
         },
       ])
       .select()
@@ -41,10 +87,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
     }
 
-    // 3. Insert Order Items
-    const orderItems = items.map((item: any) => ({
+    const orderItems = totals.items.map((item) => ({
       order_id: order.id,
-      item_name: item.name,
+      item_name: item.item_name,
       quantity: item.quantity,
       price: item.price,
       image: item.image,
@@ -56,15 +101,24 @@ export async function POST(req: Request) {
 
     if (itemsError) {
       console.error("Order Items Insert Error:", itemsError);
-      // Depending on strictness, we might delete the order here if items fail
+      await supabaseAdmin.from("orders").delete().eq("id", order.id);
       return NextResponse.json({ error: "Failed to save order items" }, { status: 500 });
     }
 
-    // 4. Return Success
     return NextResponse.json({ success: true, orderNumber: order.order_number });
-
   } catch (error) {
+    if (isBodyParsingError(error)) {
+      const message = error instanceof Error ? error.message : "Invalid request body";
+      const status = message.includes("large") ? 413 : 400;
+      return NextResponse.json({ error: message }, { status });
+    }
+
+    const message = error instanceof Error ? error.message : "Internal Server Error";
+    const status = message.includes("Invalid") || message.includes("empty") ? 400 : 500;
     console.error("Checkout API Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: status === 400 ? message : "Internal Server Error" },
+      { status }
+    );
   }
 }

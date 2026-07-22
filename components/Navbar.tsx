@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { User, Menu, X, Minus, Plus, Trash2, CircleUserRound } from "lucide-react";
+import { User, Menu, X, Minus, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "@/backend/supabase";
 import { useCartStore } from "@/lib/cartStore";
 import ProfileDrawer from "./ProfileDrawer";
@@ -14,7 +15,7 @@ export default function Navbar() {
   const [cartOpen, setCartOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
 
   // Listen for custom event to open the drawer
   useEffect(() => {

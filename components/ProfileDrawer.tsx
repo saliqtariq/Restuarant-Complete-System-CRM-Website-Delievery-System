@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { X, FileText, MapPin, CreditCard, Heart, Loader2, Camera, ChevronLeft } from "lucide-react";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "@/backend/supabase";
 
 interface ProfileDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  user: any;
+  user: SupabaseUser | null;
   handleSignOut: () => void;
 }
 
@@ -28,7 +29,8 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
 
   // Initialize form state when user changes or drawer opens
   useEffect(() => {
-    if (user && user.user_metadata) {
+    const id = window.setTimeout(() => {
+      if (!user?.user_metadata) return;
       setFirstName(user.user_metadata.first_name || "");
       setLastName(user.user_metadata.last_name || "");
       setPhone(user.user_metadata.phone || "");
@@ -36,7 +38,9 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
       setGender(user.user_metadata.gender || "");
       setAvatarFile(null);
       setAvatarPreview(null);
-    }
+    }, 0);
+
+    return () => window.clearTimeout(id);
   }, [user, isOpen]);
 
   const fullName = `${user?.user_metadata?.first_name || ""} ${user?.user_metadata?.last_name || ""}`.trim() || "PROFILE";
@@ -64,6 +68,8 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
     // Upload avatar if a new file was selected
     if (avatarFile) {
       const fileExt = avatarFile.name.split(".").pop();
+      if (!user) return;
+
       const filePath = `avatars/${user.id}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage

@@ -28,7 +28,7 @@ export default async function ReportsPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Overview of your restaurant's performance.
+          Overview of your restaurant&apos;s performance.
         </p>
       </div>
 

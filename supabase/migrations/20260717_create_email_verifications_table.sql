@@ -7,6 +7,8 @@ CREATE TABLE email_verifications (
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   code text NOT NULL,
   expires_at timestamptz NOT NULL,
+  failed_attempts integer NOT NULL DEFAULT 0,
+  locked_until timestamptz,
   created_at timestamptz DEFAULT now()
 );
 

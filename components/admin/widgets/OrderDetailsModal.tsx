@@ -16,13 +16,23 @@ export function OrderDetailsModal({ isOpen, onClose, order }: Props) {
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
-    if (isOpen && order) {
-      setLoadingItems(true);
-      getOrderItems(order.id)
-        .then((data) => setItems(data))
+    if (!isOpen || !order) return;
+
+    let active = true;
+    void getOrderItems(order.id)
+        .then((data) => {
+          if (!active) return;
+          setItems(data);
+        })
         .catch((err) => console.error("Error fetching items:", err))
-        .finally(() => setLoadingItems(false));
-    }
+        .finally(() => {
+          if (active) setLoadingItems(false);
+        });
+
+    return () => {
+      active = false;
+      setLoadingItems(true);
+    };
   }, [isOpen, order]);
 
   if (!isOpen || !order) return null;

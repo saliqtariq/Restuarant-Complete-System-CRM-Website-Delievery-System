@@ -46,7 +46,7 @@ export default function ContactPage() {
             Contact Support
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            We'd love to hear from you! Whether you have a suggestion, review, or need assistance, please drop us a message below.
+            We&apos;d love to hear from you! Whether you have a suggestion, review, or need assistance, please drop us a message below.
           </p>
         </div>
 

@@ -1,6 +1,7 @@
 "use server";
 
 import { supabaseAdmin } from "@/backend/supabaseServer";
+import { requireAdmin } from "@/lib/auth/admin";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -89,6 +90,7 @@ function yesterdayRange() {
 // ─── Summary Cards Data ───────────────────────────────────────────────────────
 
 export async function getDashboardSummary(): Promise<DashboardSummary> {
+  await requireAdmin();
   const today = todayRange();
   const yesterday = yesterdayRange();
 
@@ -149,6 +151,7 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
 // ─── Live Orders ──────────────────────────────────────────────────────────────
 
 export async function getLiveOrders(): Promise<OrderRow[]> {
+  await requireAdmin();
   const { data, error } = await supabaseAdmin
     .from("orders")
     .select("*")
@@ -167,6 +170,7 @@ export async function getLiveOrders(): Promise<OrderRow[]> {
 // ─── Order Status Counts ──────────────────────────────────────────────────────
 
 export async function getOrderStatusCounts(): Promise<OrderStatusCounts> {
+  await requireAdmin();
   const today = todayRange();
 
   const { data, error } = await supabaseAdmin
@@ -192,6 +196,7 @@ export async function getOrderStatusCounts(): Promise<OrderStatusCounts> {
 // ─── Pickup Queue ─────────────────────────────────────────────────────────────
 
 export async function getPickupQueue(): Promise<PickupQueueItem[]> {
+  await requireAdmin();
   const { data, error } = await supabaseAdmin
     .from("orders")
     .select("id, order_number, customer_name, phone, status, payment_method, created_at")
@@ -210,6 +215,7 @@ export async function getPickupQueue(): Promise<PickupQueueItem[]> {
 // ─── Sales Overview (last 7 days) ─────────────────────────────────────────────
 
 export async function getSalesOverview(): Promise<SalesDay[]> {
+  await requireAdmin();
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const now = new Date();
   const sevenDaysAgo = new Date(now);
@@ -246,6 +252,7 @@ export async function getSalesOverview(): Promise<SalesDay[]> {
 // ─── Top Selling Items ────────────────────────────────────────────────────────
 
 export async function getTopSellingItems(): Promise<TopItem[]> {
+  await requireAdmin();
   const { data, error } = await supabaseAdmin
     .from("order_items")
     .select("item_name, quantity, price");
@@ -270,6 +277,7 @@ export async function getTopSellingItems(): Promise<TopItem[]> {
 // ─── Payment Method Breakdown ─────────────────────────────────────────────────
 
 export async function getPaymentMethodBreakdown(): Promise<PaymentBreakdown[]> {
+  await requireAdmin();
   const { data, error } = await supabaseAdmin
     .from("orders")
     .select("payment_method, grand_total")

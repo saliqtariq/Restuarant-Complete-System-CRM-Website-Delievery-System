@@ -19,6 +19,12 @@ const OUTLETS = [
   { id: 3, name: "Abraham's Table - Johar Town", address: "Block R1, Johar Town, Lahore", position: [31.4697, 74.2728] as [number, number] },
 ];
 
+type NominatimResult = {
+  lat: string;
+  lon: string;
+  display_name: string;
+};
+
 interface LocationModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -30,7 +36,7 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
 
   // Delivery State
   const [searchQuery, setSearchQuery] = useState("");
-  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<NominatimResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [mapPosition, setMapPosition] = useState<[number, number]>([31.5204, 74.3587]);
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
@@ -47,7 +53,7 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
           const res = await fetch(
             `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery + ", Lahore")}&format=json&limit=5`
           );
-          const data = await res.json();
+          const data = (await res.json()) as NominatimResult[];
           setSuggestions(data);
         } catch (err) {
           console.error("Geocoding error", err);
@@ -62,7 +68,7 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, activeTab]);
 
-  const handleSelectLocation = (location: any) => {
+  const handleSelectLocation = (location: NominatimResult) => {
     setMapPosition([parseFloat(location.lat), parseFloat(location.lon)]);
     const shortAddress = location.display_name.split(",").slice(0, 2).join(",");
     setSelectedAddress(shortAddress);

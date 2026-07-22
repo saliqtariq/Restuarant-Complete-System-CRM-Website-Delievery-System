@@ -1,6 +1,7 @@
 "use server";
 
 import { supabaseAdmin } from "@/backend/supabaseServer";
+import { requireAdmin } from "@/lib/auth/admin";
 import { revalidatePath } from "next/cache";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -42,6 +43,7 @@ export async function getMenuCategories(): Promise<MenuCategory[]> {
 export async function createMenuCategory(
   input: Omit<MenuCategory, "id" | "created_at">
 ): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
   const { error } = await supabaseAdmin.from("menu_categories").insert([input]);
 
   if (error) {
@@ -57,6 +59,7 @@ export async function updateMenuCategory(
   id: string,
   input: Partial<Omit<MenuCategory, "id" | "created_at">>
 ): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
   const { error } = await supabaseAdmin
     .from("menu_categories")
     .update(input)
@@ -74,6 +77,7 @@ export async function updateMenuCategory(
 export async function deleteMenuCategory(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
   const { error } = await supabaseAdmin
     .from("menu_categories")
     .delete()
@@ -112,6 +116,7 @@ export async function getMenuItems(categoryId?: string): Promise<MenuItem[]> {
 export async function createMenuItem(
   input: Omit<MenuItem, "id" | "created_at">
 ): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
   const { error } = await supabaseAdmin.from("menu_items").insert([input]);
 
   if (error) {
@@ -127,6 +132,7 @@ export async function updateMenuItem(
   id: string,
   input: Partial<Omit<MenuItem, "id" | "created_at">>
 ): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
   const { error } = await supabaseAdmin
     .from("menu_items")
     .update(input)
@@ -144,6 +150,7 @@ export async function updateMenuItem(
 export async function deleteMenuItem(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
   const { error } = await supabaseAdmin
     .from("menu_items")
     .delete()
@@ -162,5 +169,6 @@ export async function toggleItemAvailability(
   id: string,
   isAvailable: boolean
 ): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
   return updateMenuItem(id, { is_available: isAvailable });
 }

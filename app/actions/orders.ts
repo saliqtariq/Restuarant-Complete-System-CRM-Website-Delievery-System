@@ -1,6 +1,7 @@
 "use server";
 
 import { supabaseAdmin } from "@/backend/supabaseServer";
+import { requireAdmin } from "@/lib/auth/admin";
 import { revalidatePath } from "next/cache";
 import { OrderRow } from "./dashboard";
 
@@ -17,6 +18,7 @@ export async function updateOrderStatus(
   orderId: string,
   newStatus: OrderStatus
 ): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
   const { error } = await supabaseAdmin
     .from("orders")
     .update({ status: newStatus })
@@ -35,8 +37,11 @@ export async function updatePaymentStatus(
   orderId: string,
   newPaymentStatus: "approved" | "rejected"
 ): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
   // If approved, we also move the order out of 'awaiting_payment' into 'pending'
-  const updates: any = { payment_status: newPaymentStatus };
+  const updates: { payment_status: "approved" | "rejected"; status?: OrderStatus } = {
+    payment_status: newPaymentStatus,
+  };
   if (newPaymentStatus === "approved") {
     updates.status = "pending";
   } else if (newPaymentStatus === "rejected") {
@@ -68,6 +73,7 @@ export type OrderItemRow = {
 };
 
 export async function getOrderItems(orderId: string): Promise<OrderItemRow[]> {
+  await requireAdmin();
   const { data, error } = await supabaseAdmin
     .from("order_items")
     .select("*")
@@ -81,6 +87,7 @@ export async function getOrderItems(orderId: string): Promise<OrderItemRow[]> {
 }
 
 export async function getOrders(type?: "all" | "pickup" | "delivery"): Promise<OrderRow[]> {
+  await requireAdmin();
   let query = supabaseAdmin
     .from("orders")
     .select("*")
@@ -101,6 +108,7 @@ export async function getOrders(type?: "all" | "pickup" | "delivery"): Promise<O
 }
 
 export async function getPendingPayments(): Promise<OrderRow[]> {
+  await requireAdmin();
   const { data, error } = await supabaseAdmin
     .from("orders")
     .select("*")

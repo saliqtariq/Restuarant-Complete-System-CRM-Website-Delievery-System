@@ -1,3 +1,5 @@
+"use client";
+
 import { useCartStore } from "@/lib/cartStore";
 import Image from "next/image";
 import { Minus, Plus, Trash2, ChevronRight, ChevronDown } from "lucide-react";
@@ -40,7 +42,7 @@ export default function CartSidebar() {
             />
           </div>
           <h3 className="text-2xl uppercase text-[#111] font-bold tracking-wider shrink-0" style={{ fontFamily: "var(--font-bebas)" }}>
-            You haven't added any items in bucket yet
+            You haven&apos;t added any items in bucket yet
           </h3>
         </div>
       ) : (

@@ -101,7 +101,7 @@ export function Sidebar({ counts }: SidebarProps) {
         <div className="bg-[#5A0A0A] rounded-xl p-3 relative overflow-hidden border border-[#7A1A1A]" style={{ minHeight: 120 }}>
           <div className="relative z-10">
             <h4 className="text-white font-extrabold text-base leading-tight uppercase">OUTLAW<br/>ZINGER</h4>
-            <p className="text-gray-300 text-[10px] mt-0.5 mb-2">Today's Special</p>
+            <p className="text-gray-300 text-[10px] mt-0.5 mb-2">Today&apos;s Special</p>
             <button className="bg-[#E63946] hover:bg-red-600 text-white text-[10px] font-bold py-1.5 px-3 rounded transition-colors shadow-md">
               View Menu
             </button>
