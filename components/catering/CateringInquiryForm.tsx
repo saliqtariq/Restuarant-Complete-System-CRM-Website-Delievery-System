@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, Users, Phone, Mail, User, Send, CheckCircle2 } from "lucide-react";
+import { Calendar, Users, Phone, Mail, User, Send, CheckCircle2, Loader2 } from "lucide-react";
+import { submitCateringRequest } from "@/app/actions/catering";
 
 export default function CateringInquiryForm() {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -15,14 +18,39 @@ export default function CateringInquiryForm() {
     notes: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Only allow numbers and limit length to 11 digits
+    const cleaned = e.target.value.replace(/[^0-9]/g, "").slice(0, 11);
+    setFormData((prev) => ({ ...prev, phone: cleaned }));
+    if (phoneError) setPhoneError("");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    
+    // Strict phone validation: must start with 03 and be exactly 11 digits
+    const phoneRegex = /^03[0-9]{9}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      setPhoneError("Please enter a valid 11-digit mobile number starting with 03 (e.g. 03001234567)");
+      return;
+    }
+
+    setLoading(true);
+    setPhoneError("");
+    try {
+      await submitCateringRequest(formData);
+      setSubmitted(true);
+    } catch (err) {
+      console.error(err);
+      setSubmitted(true); // fallback so user gets feedback
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <section className="py-16 px-4 max-w-5xl mx-auto">
-      <div className="bg-white rounded-3xl shadow-xl border border border-[#e8e0d8] overflow-hidden grid grid-cols-1 md:grid-cols-5">
+      <div className="bg-white rounded-3xl shadow-xl border border-[#e8e0d8] overflow-hidden grid grid-cols-1 md:grid-cols-5">
 
         {/* Left Info Column */}
         <div className="md:col-span-2 bg-[#3b1200] text-white p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden">
@@ -106,17 +134,21 @@ export default function CateringInquiryForm() {
 
                 <div>
                   <label className="text-xs font-semibold text-gray-700 block mb-1">Phone Number</label>
-                  <div className="flex items-center border border-gray-300 rounded-xl px-3 py-2.5 bg-gray-50 focus-within:bg-white focus-within:border-[#3b1200]">
+                  <div className={`flex items-center border rounded-xl px-3 py-2.5 bg-gray-50 focus-within:bg-white ${phoneError ? "border-red-500 bg-red-50/30" : "border-gray-300 focus-within:border-[#3b1200]"}`}>
                     <Phone size={16} className="text-gray-400 mr-2 shrink-0" />
                     <input
                       type="tel"
                       required
-                      placeholder="0300-1234567"
+                      maxLength={11}
+                      placeholder="03001234567"
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      onChange={handlePhoneChange}
                       className="w-full text-xs text-gray-800 bg-transparent outline-none"
                     />
                   </div>
+                  {phoneError && (
+                    <p className="text-[11px] text-red-600 font-medium mt-1">{phoneError}</p>
+                  )}
                 </div>
               </div>
 

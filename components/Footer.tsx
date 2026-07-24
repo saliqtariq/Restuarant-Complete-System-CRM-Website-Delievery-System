@@ -2,6 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
+import { supabase } from '@/backend/supabase';
+
 const Facebook = ({ size = 24 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
@@ -23,6 +27,22 @@ const Instagram = ({ size = 24 }: { size?: number }) => (
 );
 
 export default function Footer() {
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const userName = user?.user_metadata?.first_name || user?.email?.split('@')[0] || "User";
+
   return (
     <footer className="w-full bg-white text-[#3E2b2f] pt-16 pb-8 border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,7 +82,7 @@ export default function Footer() {
             </Link>
           </div>
 
-          {/* Column 3 - Join Promo */}
+          {/* Column 3 - User Account / Join Promo */}
           <div className="self-start w-full flex flex-col items-center justify-center md:-mt-3 md:items-end">
             <div className="flex w-[168px] flex-col items-center text-center">
               {/* Logo */}
@@ -74,37 +94,57 @@ export default function Footer() {
                 className="h-[52px] w-auto object-contain"
               />
 
-              {/* Welcome Back */}
-              <p className="mt-1 text-[#a32a22] text-[8px] font-bold uppercase tracking-[0.14em] leading-none whitespace-nowrap">
-                Welcome Back,
-              </p>
+              {user ? (
+                <>
+                  {/* Welcome Back */}
+                  <p className="mt-1 text-[#a32a22] text-[8px] font-bold uppercase tracking-[0.14em] leading-none whitespace-nowrap">
+                    Welcome Back,
+                  </p>
 
-              {/* Name */}
-              <h2
-                className="text-[2rem] leading-none font-normal uppercase text-[#451400]"
-                style={{ fontFamily: "var(--font-anton)" }}
-              >
-                Saliq
-              </h2>
+                  {/* Name */}
+                  <h2
+                    className="text-[2rem] leading-none font-normal uppercase text-[#451400] truncate max-w-full"
+                    style={{ fontFamily: "var(--font-anton)" }}
+                  >
+                    {userName}
+                  </h2>
 
-              {/* Subtitle */}
-              <p className="mt-1.5 text-[#6b7280] text-[10px] leading-snug">
-                Check your rewards and
-                <br />
-                recent order history.
-              </p>
+                  {/* Subtitle */}
+                  <p className="mt-1.5 text-[#6b7280] text-[10px] leading-snug">
+                    Check your rewards and
+                    <br />
+                    recent order history.
+                  </p>
 
-              {/* View Account button */}
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.dispatchEvent(new Event("open-profile-drawer"));
-                }}
-                className="mt-2.5 w-full border border-[#451400] rounded-sm bg-white px-3 py-1.5 text-[#451400] text-sm font-bold uppercase tracking-wide hover:bg-[#451400] hover:text-white transition-colors"
-                style={{ fontFamily: "var(--font-anton)" }}
-              >
-                View Account
-              </button>
+                  {/* View Account button */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.dispatchEvent(new Event("open-profile-drawer"));
+                    }}
+                    className="mt-2.5 w-full border border-[#451400] rounded-sm bg-white px-3 py-1.5 text-[#451400] text-sm font-bold uppercase tracking-wide hover:bg-[#451400] hover:text-white transition-colors"
+                    style={{ fontFamily: "var(--font-anton)" }}
+                  >
+                    View Account
+                  </button>
+                </>
+              ) : (
+                <>
+                  {/* Subtitle */}
+                  <p className="mt-2 text-[#6b7280] text-[10px] leading-snug">
+                    Join rewards, order online, and track your recent orders.
+                  </p>
+
+                  {/* Sign In / Join button */}
+                  <Link
+                    href="/signin"
+                    className="mt-3 w-full border border-[#451400] rounded-sm bg-[#451400] px-3 py-1.5 text-white text-sm font-bold uppercase tracking-wide hover:bg-[#7a2e15] text-center transition-colors block"
+                    style={{ fontFamily: "var(--font-anton)" }}
+                  >
+                    Sign In / Join
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

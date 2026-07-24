@@ -8,6 +8,7 @@ import {
   ClipboardList,
   ShoppingBag,
   Truck,
+  UtensilsCrossed,
   Users,
   MenuSquare,
   CreditCard,
@@ -34,6 +35,7 @@ export function Sidebar({ counts }: SidebarProps) {
     { name: "Orders", href: "/dashboard/orders", icon: ClipboardList, badge: counts?.orders ? counts.orders : null },
     { name: "Pickup Orders", href: "/dashboard/pickup", icon: ShoppingBag, badge: counts?.pickup ? counts.pickup : null },
     { name: "Delivery Orders", href: "/dashboard/delivery", icon: Truck, badge: counts?.delivery ? counts.delivery : null },
+    { name: "Catering", href: "/dashboard/catering", icon: UtensilsCrossed, badge: null },
     { name: "Payments", href: "/dashboard/payments", icon: CreditCard, badge: null },
     { name: "Delivery Drivers Management", href: "/dashboard/drivers", icon: MapPin, badge: null },
     { name: "Coupons & Offers", href: "/dashboard/coupons", icon: Tag, badge: null },
@@ -45,7 +47,7 @@ export function Sidebar({ counts }: SidebarProps) {
   ];
 
   return (
-    <aside className="w-[220px] shrink-0 bg-[#3B0A0A] text-white flex flex-col h-screen sticky top-0 overflow-y-auto">
+    <aside className="w-[220px] shrink-0 bg-[#3B0A0A] text-white flex flex-col h-screen sticky top-0 overflow-y-auto sidebar-scroll">
 
       {/* Logo */}
       <div className="flex items-center justify-center px-4 pt-3 pb-1">

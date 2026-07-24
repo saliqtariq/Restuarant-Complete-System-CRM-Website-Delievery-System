@@ -13,6 +13,7 @@ export default function SignUpPage() {
   const [lastName, setLastName] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -43,6 +44,7 @@ export default function SignUpPage() {
           last_name: lastName,
           dob: dob,
           gender: gender,
+          phone: phone,
           email_marketing: emailMarketing
         }
       }
@@ -194,6 +196,21 @@ export default function SignUpPage() {
                 <option value="Others">Others</option>
               </select>
             </div>
+          </div>
+
+          {/* Phone Number */}
+          <div className="mb-3">
+            <label htmlFor="signup-phone" className="block text-xs text-black mb-0.5 font-medium">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              id="signup-phone"
+              className="w-full bg-transparent border-0 border-b border-gray-300 py-1.5 text-[#4a1c0d] text-sm font-medium outline-none transition-colors duration-200 focus:border-[#a62116]"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="03XXXXXXXXX"
+            />
           </div>
 
           {/* Email */}

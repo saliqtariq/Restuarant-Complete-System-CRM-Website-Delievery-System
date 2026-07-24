@@ -34,7 +34,7 @@ const cards = [
     ],
     boldNote: "Order & Enjoy Today",
     ctaLabel: "START A GROUP ORDER",
-    ctaHref: "/group-order",
+    ctaHref: "/catering",
   },
 ];
 

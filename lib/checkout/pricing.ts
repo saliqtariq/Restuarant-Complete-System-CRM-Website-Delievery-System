@@ -22,12 +22,13 @@ export type ValidatedOrderItem = {
 export type OrderTotals = {
   subtotal: number;
   deliveryFee: number;
+  discount: number;
   gst: number;
   grandTotal: number;
   items: ValidatedOrderItem[];
 };
 
-async function resolveUnitPrice(name: string): Promise<number | null> {
+async function resolveUnitPrice(name: string, rawPriceStr?: string): Promise<number | null> {
   const normalized = normalizeItemName(name);
 
   const { data: menuItem } = await supabaseAdmin
@@ -42,12 +43,23 @@ async function resolveUnitPrice(name: string): Promise<number | null> {
   }
 
   const catalogItem = getCatalogItem(normalized);
-  return catalogItem?.price ?? null;
+  if (catalogItem) {
+    return catalogItem.price;
+  }
+
+  // Fallback for custom catering boxes / preset catering items
+  if (rawPriceStr) {
+    const parsed = parseDisplayPrice(rawPriceStr);
+    if (parsed > 0) return parsed;
+  }
+
+  return null;
 }
 
 export async function calculateOrderTotals(
   items: CheckoutCartItem[],
-  orderType: "pickup" | "delivery"
+  orderType: "pickup" | "delivery",
+  couponCode?: string
 ): Promise<OrderTotals> {
   if (!items.length) {
     throw new Error("Cart is empty");
@@ -61,7 +73,7 @@ export async function calculateOrderTotals(
       throw new Error("Invalid cart item");
     }
 
-    const unitPrice = await resolveUnitPrice(item.name);
+    const unitPrice = await resolveUnitPrice(item.name, item.price);
     if (unitPrice === null) {
       throw new Error(`Invalid or unavailable item: ${item.name}`);
     }
@@ -79,13 +91,40 @@ export async function calculateOrderTotals(
     });
   }
 
+  let discount = 0;
+  if (couponCode) {
+    const { data: coupon } = await supabaseAdmin
+      .from("coupons")
+      .select("*")
+      .eq("code", couponCode)
+      .eq("is_active", true)
+      .single();
+
+    if (coupon) {
+      const isValid =
+        (!coupon.expiry_date || new Date(coupon.expiry_date) >= new Date()) &&
+        subtotal >= coupon.min_order_amount;
+      
+      if (isValid) {
+        if (coupon.discount_type === "percentage") {
+          discount = subtotal * (coupon.discount_amount / 100);
+        } else {
+          discount = coupon.discount_amount;
+        }
+        discount = Math.min(discount, subtotal);
+      }
+    }
+  }
+
   const deliveryFee = orderType === "pickup" ? 0 : subtotal > 0 ? DELIVERY_FEE : 0;
-  const gst = subtotal * GST_RATE;
-  const grandTotal = subtotal + deliveryFee + gst;
+  const taxableAmount = Math.max(0, subtotal - discount);
+  const gst = taxableAmount * GST_RATE;
+  const grandTotal = taxableAmount + deliveryFee + gst;
 
   return {
     subtotal,
     deliveryFee,
+    discount,
     gst,
     grandTotal,
     items: validatedItems,

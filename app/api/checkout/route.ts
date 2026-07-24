@@ -11,7 +11,7 @@ const checkoutSchema = z.object({
   items: z
     .array(
       z.object({
-        name: z.string().trim().min(1).max(100),
+        name: z.string().trim().min(1).max(500),
         price: z.string().max(50).optional().default(""),
         image: z.string().max(300).optional().default(""),
         quantity: z.number().int().min(1).max(20),
@@ -26,9 +26,10 @@ const checkoutSchema = z.object({
     city: z.string().trim().max(80).optional().default("N/A"),
     address: z.string().trim().max(250).optional().default("N/A"),
     paymentMethod: z
-      .enum(["cod", "easypaisa", "jazzcash", "card"])
+      .enum(["cod", "easypaisa", "jazzcash", "card", "safepay"])
       .optional()
       .default("cod"),
+    couponCode: z.string().max(50).optional(),
   }),
 });
 
@@ -57,7 +58,7 @@ export async function POST(req: Request) {
     }
 
     const orderType = delivery.type === "pickup" ? "pickup" : "delivery";
-    const totals = await calculateOrderTotals(items, orderType);
+    const totals = await calculateOrderTotals(items, orderType, delivery.couponCode);
 
     const orderNumber = `ORD-${randomInt(100000, 1000000)}`;
 
