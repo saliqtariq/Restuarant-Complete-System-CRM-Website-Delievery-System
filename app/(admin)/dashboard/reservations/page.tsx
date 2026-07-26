@@ -1,20 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { getReservations, updateReservationStatus, type Reservation } from "@/app/actions/reservations";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
 
-type Reservation = {
-  id: string;
-  customer_name: string;
-  phone: string;
-  reservation_date: string;
-  reservation_time: string;
-  number_of_guests: number;
-  table_number: string | null;
-  status: string;
-  created_at: string;
-};
+function formatTime12h(time: string): string {
+  // time is "HH:MM" in 24h
+  const [hStr, mStr] = time.split(":");
+  const h = parseInt(hStr, 10);
+  const suffix = h < 12 ? "AM" : "PM";
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  return `${hour12}:${mStr} ${suffix}`;
+}
 
 export default function ReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -26,14 +23,8 @@ export default function ReservationsPage() {
 
   const fetchReservations = async () => {
     try {
-      const { data, error } = await supabase
-        .from("reservations")
-        .select("*")
-        .order("reservation_date", { ascending: false })
-        .order("reservation_time", { ascending: false });
-
-      if (error) throw error;
-      setReservations(data || []);
+      const data = await getReservations();
+      setReservations(data);
     } catch (error) {
       console.error("Error fetching reservations:", error);
     } finally {
@@ -43,19 +34,16 @@ export default function ReservationsPage() {
 
   const updateStatus = async (id: string, newStatus: string) => {
     try {
-      const { error } = await supabase
-        .from("reservations")
-        .update({ status: newStatus })
-        .eq("id", id);
+      const { success, error } = await updateReservationStatus(id, newStatus);
       
-      if (error) throw error;
+      if (!success) throw new Error(error || "Failed to update status");
       
       setReservations((prev) => 
         prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating status:", error);
-      alert("Failed to update status");
+      alert(error.message || "Failed to update status");
     }
   };
 
@@ -79,7 +67,8 @@ export default function ReservationsPage() {
                 <tr>
                   <th className="px-6 py-4">Customer</th>
                   <th className="px-6 py-4">Phone</th>
-                  <th className="px-6 py-4">Date & Time</th>
+                  <th className="px-6 py-4">Date</th>
+                  <th className="px-6 py-4">Time</th>
                   <th className="px-6 py-4">Guests</th>
                   <th className="px-6 py-4">Table</th>
                   <th className="px-6 py-4">Status</th>
@@ -91,10 +80,8 @@ export default function ReservationsPage() {
                   <tr key={res.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-4 font-medium text-gray-900">{res.customer_name}</td>
                     <td className="px-6 py-4">{res.phone}</td>
-                    <td className="px-6 py-4">
-                      {res.reservation_date} <br/>
-                      <span className="text-xs text-gray-500">{res.reservation_time}</span>
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">{res.reservation_date}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{formatTime12h(res.reservation_time)}</td>
                     <td className="px-6 py-4">{res.number_of_guests}</td>
                     <td className="px-6 py-4">{res.table_number || "-"}</td>
                     <td className="px-6 py-4">

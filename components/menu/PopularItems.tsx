@@ -28,7 +28,7 @@ const popularItems = [
   {
     name: "OUTLAW ZINGER",
     price: "RS 790",
-    image: "/Outlaw Burger.png",
+    image: "/Outlaw zinger withnobg.png",
   },
 ];
 

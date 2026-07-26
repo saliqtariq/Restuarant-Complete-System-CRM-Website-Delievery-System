@@ -20,9 +20,9 @@ export const menuData = [
     id: "la-carta-combos",
     title: "LA Carta & Combos",
     items: [
-      { name: "Outlaw Zinger", price: "RS 790", image: "/Outlaw Burger.png", serves: "Premium crispy chicken fillet, cheese, spicy mayo" },
-      { name: "Zinger Butcher", price: "RS 650", image: "/Zinger Butcher.png", serves: "Crispy chicken fillet with fresh lettuce and mayo" },
-      { name: "Abraham's Double Stack", price: "RS 890", image: "/Abraham's Double Stack.png", serves: "Two crispy fillets with double cheese" },
+      { name: "Outlaw Zinger", price: "RS 790", image: "/Outlaw zinger withnobg.png", serves: "Premium crispy chicken fillet, cheese, spicy mayo" },
+      { name: "Zinger Butcher", price: "RS 650", image: "/Zinger Butcher No bg.png", serves: "Crispy chicken fillet with fresh lettuce and mayo" },
+      { name: "Abraham's Double Stack", price: "RS 890", image: "/Abraham's Double Stack no bg.png", serves: "Two crispy fillets with double cheese" },
     ]
   },
   {

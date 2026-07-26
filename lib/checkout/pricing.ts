@@ -1,12 +1,11 @@
 import { supabaseAdmin } from "@/backend/supabaseServer";
-import { getCatalogItem, normalizeItemName, parseDisplayPrice } from "@/lib/menu/catalog";
 
 const DELIVERY_FEE = 150;
 const GST_RATE = 0.16;
 
 export type CheckoutCartItem = {
   name: string;
-  price: string;
+  price: string; // kept for display only — NEVER used for price calculation
   image: string;
   quantity: number;
 };
@@ -28,32 +27,30 @@ export type OrderTotals = {
   items: ValidatedOrderItem[];
 };
 
-async function resolveUnitPrice(name: string, rawPriceStr?: string): Promise<number | null> {
-  const normalized = normalizeItemName(name);
-
+/**
+ * Resolve the authoritative unit price for an item strictly from the database.
+ * The client-sent price is NEVER used — this prevents price manipulation attacks.
+ * Returns null if:
+ *   - The item does not exist in the database
+ *   - The item is marked as unavailable
+ */
+async function resolveUnitPrice(name: string): Promise<{ price: number; image: string } | null> {
   const { data: menuItem } = await supabaseAdmin
     .from("menu_items")
-    .select("name, price, is_available")
-    .ilike("name", name)
+    .select("name, price, is_available, image_url")
+    .ilike("name", name.trim())
     .maybeSingle();
 
-  if (menuItem) {
-    if (menuItem.is_available === false) return null;
-    return Number(menuItem.price);
-  }
+  // Item not found in DB → reject. Never fall back to client-sent price.
+  if (!menuItem) return null;
 
-  const catalogItem = getCatalogItem(normalized);
-  if (catalogItem) {
-    return catalogItem.price;
-  }
+  // Item marked unavailable → reject
+  if (menuItem.is_available === false) return null;
 
-  // Fallback for custom catering boxes / preset catering items
-  if (rawPriceStr) {
-    const parsed = parseDisplayPrice(rawPriceStr);
-    if (parsed > 0) return parsed;
-  }
-
-  return null;
+  return {
+    price: Number(menuItem.price),
+    image: menuItem.image_url || "",
+  };
 }
 
 export async function calculateOrderTotals(
@@ -73,21 +70,23 @@ export async function calculateOrderTotals(
       throw new Error("Invalid cart item");
     }
 
-    const unitPrice = await resolveUnitPrice(item.name, item.price);
-    if (unitPrice === null) {
-      throw new Error(`Invalid or unavailable item: ${item.name}`);
+    const resolved = await resolveUnitPrice(item.name);
+
+    if (resolved === null) {
+      // Item unknown or unavailable — reject the entire order with a clear message
+      throw new Error(`"${item.name}" is not available or does not exist on our menu.`);
     }
 
-    const catalogItem = getCatalogItem(item.name);
-    const lineTotal = unitPrice * item.quantity;
+    const lineTotal = resolved.price * item.quantity;
     subtotal += lineTotal;
 
     validatedItems.push({
       item_name: item.name,
       quantity: item.quantity,
-      price: `RS ${unitPrice}`,
-      image: catalogItem?.image || item.image || "",
-      unitPrice,
+      price: `RS ${resolved.price}`,
+      // Use DB image if available, fall back to client-sent image (images are not a security concern)
+      image: resolved.image || item.image || "",
+      unitPrice: resolved.price,
     });
   }
 
@@ -104,7 +103,7 @@ export async function calculateOrderTotals(
       const isValid =
         (!coupon.expiry_date || new Date(coupon.expiry_date) >= new Date()) &&
         subtotal >= coupon.min_order_amount;
-      
+
       if (isValid) {
         if (coupon.discount_type === "percentage") {
           discount = subtotal * (coupon.discount_amount / 100);
@@ -131,4 +130,4 @@ export async function calculateOrderTotals(
   };
 }
 
-export { parseDisplayPrice };
+export { parseDisplayPrice } from "@/lib/menu/catalog";

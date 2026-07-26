@@ -1,8 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, Loader2, CheckCircle2, CalendarDays, Clock, Users, Hash } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle2, CalendarDays, Clock, Users, Hash, AlertCircle } from "lucide-react";
+
+type SlotAvailability = {
+  time: string;
+  tablesRemaining: number;
+  isFull: boolean;
+};
+
+// Generate 12-hour time slot options (every 30 min, restaurant hours 11am-11pm)
+const ALL_TIME_SLOTS: { label: string; value: string }[] = [];
+for (let h = 11; h <= 23; h++) {
+  for (const m of [0, 30]) {
+    const suffix = h < 12 ? "AM" : "PM";
+    const hour12 = h % 12 === 0 ? 12 : h % 12;
+    const minuteStr = m === 0 ? "00" : "30";
+    const label = `${hour12}:${minuteStr} ${suffix}`;
+    const value = `${String(h).padStart(2, "0")}:${minuteStr}`;
+    ALL_TIME_SLOTS.push({ label, value });
+  }
+}
 
 export default function ReservePage() {
   const [formData, setFormData] = useState({
@@ -17,13 +36,35 @@ export default function ReservePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [availability, setAvailability] = useState<SlotAvailability[]>([]);
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
+
+  const fetchAvailability = useCallback(async (date: string) => {
+    if (!date) return;
+    setLoadingAvailability(true);
+    setAvailability([]);
+    try {
+      const res = await fetch(`/api/reserve/availability?date=${date}`);
+      const data = await res.json();
+      if (res.ok) setAvailability(data.slots ?? []);
+    } catch {
+      // silently fail — slots will all be enabled
+    } finally {
+      setLoadingAvailability(false);
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: name === "number_of_guests" ? parseInt(value) || 1 : value,
+      // Reset time when date changes
+      ...(name === "reservation_date" ? { reservation_time: "" } : {}),
     }));
+    if (name === "reservation_date") {
+      fetchAvailability(value);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,7 +92,21 @@ export default function ReservePage() {
     }
   };
 
+  // Get availability info for a specific slot
+  const getSlotInfo = (slotValue: string) =>
+    availability.find((s) => s.time === slotValue);
+
+  // Get warning badge for last-table slots
+  const getSlotBadge = (slotValue: string) => {
+    const info = getSlotInfo(slotValue);
+    if (!info) return null;
+    if (info.isFull) return " — Fully Booked";
+    if (info.tablesRemaining === 1) return " — 1 table left";
+    return null;
+  };
+
   if (isSuccess) {
+    const selectedSlot = ALL_TIME_SLOTS.find((t) => t.value === formData.reservation_time);
     return (
       <main className="min-h-screen bg-gray-50 flex flex-col items-center justify-center pt-20 pb-12 px-4">
         <div className="max-w-md w-full bg-white rounded-xl shadow-md p-8 text-center border border-gray-100">
@@ -65,7 +120,8 @@ export default function ReservePage() {
           <p className="text-gray-600 mb-8">
             Thank you, {formData.customer_name}. We have received your reservation request for{" "}
             <strong className="text-black">{formData.reservation_date}</strong> at{" "}
-            <strong className="text-black">{formData.reservation_time}</strong>.
+            <strong className="text-black">{selectedSlot?.label ?? formData.reservation_time}</strong>{" "}
+            for <strong className="text-black">{formData.number_of_guests} guest{formData.number_of_guests !== 1 ? "s" : ""}</strong>.
           </p>
           <Link
             href="/"
@@ -104,9 +160,10 @@ export default function ReservePage() {
       <div className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 -mt-6 pb-20 relative z-10">
         <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
           <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
-            
+
             {errorMsg && (
-              <div className="bg-red-50 border border-red-200 text-[#e5002a] px-4 py-3 rounded-lg text-sm font-medium">
+              <div className="bg-red-50 border border-red-200 text-[#e5002a] px-4 py-3 rounded-lg text-sm font-medium flex items-start gap-2">
+                <AlertCircle size={16} className="mt-0.5 shrink-0" />
                 {errorMsg}
               </div>
             )}
@@ -122,7 +179,6 @@ export default function ReservePage() {
                   value={formData.customer_name}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#461a0f] focus:ring-1 focus:ring-[#461a0f] transition-colors"
-                  placeholder="John Doe"
                 />
               </div>
 
@@ -133,10 +189,12 @@ export default function ReservePage() {
                   type="tel"
                   name="phone"
                   required
+                  pattern="^03[0-9]{9}$"
+                  maxLength={11}
+                  title="Phone number must start with 03 and be 11 digits long (e.g., 03001234567)"
                   value={formData.phone}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#461a0f] focus:ring-1 focus:ring-[#461a0f] transition-colors"
-                  placeholder="03XXXXXXXXX"
                 />
               </div>
 
@@ -150,7 +208,7 @@ export default function ReservePage() {
                   type="date"
                   name="reservation_date"
                   required
-                  min={new Date().toISOString().split('T')[0]}
+                  min={new Date().toISOString().split("T")[0]}
                   value={formData.reservation_date}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#461a0f] focus:ring-1 focus:ring-[#461a0f] transition-colors"
@@ -162,15 +220,45 @@ export default function ReservePage() {
                 <label className="text-sm font-bold text-gray-700 flex items-center gap-2">
                   <Clock size={16} className="text-gray-400" />
                   Time
+                  {loadingAvailability && (
+                    <Loader2 size={13} className="animate-spin text-gray-400 ml-1" />
+                  )}
                 </label>
-                <input
-                  type="time"
+                <select
                   name="reservation_time"
                   required
                   value={formData.reservation_time}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#461a0f] focus:ring-1 focus:ring-[#461a0f] transition-colors"
-                />
+                  disabled={!formData.reservation_date}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#461a0f] focus:ring-1 focus:ring-[#461a0f] transition-colors bg-white text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <option value="" disabled>
+                    {formData.reservation_date ? "Select a time" : "Pick a date first"}
+                  </option>
+                  {ALL_TIME_SLOTS.map((slot) => {
+                    const info = getSlotInfo(slot.value);
+                    const isFull = info?.isFull ?? false;
+                    const badge = getSlotBadge(slot.value);
+                    return (
+                      <option key={slot.value} value={slot.value} disabled={isFull}>
+                        {slot.label}{badge ?? ""}
+                      </option>
+                    );
+                  })}
+                </select>
+                {/* Nearly-full warning for selected slot */}
+                {formData.reservation_time && (() => {
+                  const info = getSlotInfo(formData.reservation_time);
+                  if (info && !info.isFull && info.tablesRemaining === 1) {
+                    return (
+                      <p className="text-amber-600 text-xs font-medium flex items-center gap-1">
+                        <AlertCircle size={12} />
+                        Only 1 table remaining for this time slot — book quickly!
+                      </p>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
 
               {/* Guests */}
@@ -184,7 +272,7 @@ export default function ReservePage() {
                   name="number_of_guests"
                   required
                   min="1"
-                  max="50"
+                  max="48"
                   value={formData.number_of_guests}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#461a0f] focus:ring-1 focus:ring-[#461a0f] transition-colors"
@@ -203,7 +291,6 @@ export default function ReservePage() {
                   value={formData.table_number}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#461a0f] focus:ring-1 focus:ring-[#461a0f] transition-colors"
-                  placeholder="e.g. Table 5, Window seat"
                 />
               </div>
             </div>

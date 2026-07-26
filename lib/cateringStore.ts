@@ -13,9 +13,9 @@ export interface CateringBuilderItem {
 /** All builder items + preset box items */
 export const BUILDER_ITEMS: CateringBuilderItem[] = [
   // Burgers (bulk per piece)
-  { id: "b1", name: "Abraham's Double Smash Burger", pricePerUnit: 590, image: "/Abraham's Double Stack.png", category: "burgers" },
-  { id: "b2", name: "Outlaw Spicy Beef Burger", pricePerUnit: 640, image: "/Outlaw Burger.png", category: "burgers" },
-  { id: "b3", name: "Zinger Butcher Crispy Chicken", pricePerUnit: 520, image: "/Zinger Butcher.png", category: "burgers" },
+  { id: "b1", name: "Abraham's Double Smash Burger", pricePerUnit: 590, image: "/Abraham's Double Stack no bg.png", category: "burgers" },
+  { id: "b2", name: "Outlaw Spicy Beef Burger", pricePerUnit: 640, image: "/Outlaw zinger withnobg.png", category: "burgers" },
+  { id: "b3", name: "Zinger Butcher Crispy Chicken", pricePerUnit: 520, image: "/Zinger Butcher No bg.png", category: "burgers" },
 
   // Fries Buckets
   { id: "f3", name: "XL Regular Fries Bucket", pricePerUnit: 450, image: "/RegularFries.png", category: "fries" },

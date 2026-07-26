@@ -15,7 +15,7 @@ const bestSellers = [
   {
     name: "ZINGER BUTCHER",
     price: "RS 650",
-    image: "/Zinger Butcher.png",
+    image: "/Zinger Butcher No bg.png",
   },
   {
     name: "SAUCY CHICKEN PARATHA",
@@ -25,7 +25,7 @@ const bestSellers = [
   {
     name: "ABRAHAM'S DOUBLE STACK",
     price: "RS 890",
-    image: "/Abraham's Double Stack.png",
+    image: "/Abraham's Double Stack no bg.png",
   },
   {
     name: "TWISTER WRAP COMBO",

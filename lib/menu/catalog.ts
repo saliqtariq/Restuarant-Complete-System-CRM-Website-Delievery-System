@@ -5,12 +5,12 @@ export type CatalogItem = {
 };
 
 const CATALOG: Record<string, CatalogItem> = {
-  "outlaw zinger": { name: "Outlaw Zinger", price: 790, image: "/Outlaw Burger.png" },
-  "zinger butcher": { name: "Zinger Butcher", price: 650, image: "/Zinger Butcher.png" },
+  "outlaw zinger": { name: "Outlaw Zinger", price: 790, image: "/Outlaw zinger withnobg.png" },
+  "zinger butcher": { name: "Zinger Butcher", price: 650, image: "/Zinger Butcher No bg.png" },
   "abraham's double stack": {
     name: "Abraham's Double Stack",
     price: 890,
-    image: "/Abraham's Double Stack.png",
+    image: "/Abraham's Double Stack no bg.png",
   },
   "duo box": { name: "Duo Box", price: 1590, image: "/DuoboxPic.png" },
   "family meals": { name: "Family Meals", price: 2450, image: "/FamilyDeal.png" },
