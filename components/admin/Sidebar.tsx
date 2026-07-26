@@ -17,7 +17,6 @@ import {
   Tag,
   Star,
   BarChart3,
-  Settings,
   LogOut,
 } from "lucide-react";
 
@@ -44,7 +43,7 @@ export function Sidebar({ counts }: SidebarProps) {
     { name: "Reservations", href: "/dashboard/reservations", icon: CalendarDays, badge: null },
     { name: "Reviews", href: "/dashboard/reviews", icon: Star, badge: null },
     { name: "Reports & Analytics", href: "/dashboard/reports", icon: BarChart3, badge: null },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings, badge: null },
+
   ];
 
   return (
@@ -98,23 +97,11 @@ export function Sidebar({ counts }: SidebarProps) {
           Logout
         </Link>
       </nav>
-
-      {/* Promo Card — matches Figma bottom card */}
+      {/* Bottom spacing — keeps the gap that was previously occupied by the promo card */}
       <div className="p-3 pb-4">
-        <div className="bg-[#5A0A0A] rounded-xl p-3 relative overflow-hidden border border-[#7A1A1A]" style={{ minHeight: 120 }}>
-          <div className="relative z-10">
-            <h4 className="text-white font-extrabold text-base leading-tight uppercase">OUTLAW<br/>ZINGER</h4>
-            <p className="text-gray-300 text-[10px] mt-0.5 mb-2">Today&apos;s Special</p>
-            <button className="bg-[#E63946] hover:bg-red-600 text-white text-[10px] font-bold py-1.5 px-3 rounded transition-colors shadow-md">
-              View Menu
-            </button>
-          </div>
-          {/* Burger emoji as placeholder for the food image */}
-          <div className="absolute right-0 bottom-0 text-[72px] leading-none select-none pointer-events-none" style={{ filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.3))" }}>
-            🍔
-          </div>
-        </div>
+        <div className="rounded-xl" style={{ minHeight: 120 }} />
       </div>
+
     </aside>
   );
 }

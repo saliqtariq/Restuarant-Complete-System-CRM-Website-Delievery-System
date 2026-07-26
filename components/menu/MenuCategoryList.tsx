@@ -29,15 +29,15 @@ export const menuData = [
     id: "signature-boxes",
     title: "Signature Boxes",
     items: [
-      { name: "Duo Box", price: "RS 1590", image: "/DuoboxPic.png", serves: "Serves 2 persons" },
-      { name: "Family Meals", price: "RS 2450", image: "/FamilyDeal.png", serves: "Serves 4-6 people" },
+      { name: "Duo Box", price: "RS 1590", image: "/DuoBoxnoBG.png", serves: "Serves 2 persons" },
+      { name: "Family Meals", price: "RS 2450", image: "/FamilyDealNobg.png", serves: "Serves 4-6 people" },
     ]
   },
   {
     id: "snacks-beverages",
     title: "Snacks & Beverages",
     items: [
-      { name: "Crispy Chicken Bucket", price: "RS 1750", image: "/ChickenBucket.png", serves: "Serves 2-3 persons" },
+      { name: "Crispy Chicken Bucket", price: "RS 1750", image: "/Crispy Wings Bucket.png", serves: "Serves 2-3 persons" },
       { name: "7Up Regular", price: "RS 180", image: "/7upRegularWithoutBG.png", serves: "Refreshing 345ml drink" },
       { name: "Pepsi Regular", price: "RS 180", image: "/PepsiRegularnoBg.png", serves: "Chilled 345ml drink" },
       { name: "Regular Fries", price: "RS 250", image: "/RegularFries.png", serves: "Crispy golden salted fries" },
@@ -56,7 +56,7 @@ export const menuData = [
     id: "everyday-value",
     title: "Everyday Value",
     items: [
-      { name: "Burger n Chicken Combo", price: "RS 550", image: "/Burger n Chicken Combo.png", serves: "1 burger and 1 piece of crispy chicken" },
+      { name: "Burger n Chicken Combo", price: "RS 550", image: "/Burger n Chicken ComboNobg.png", serves: "1 burger and 1 piece of crispy chicken" },
     ]
   }
 ];

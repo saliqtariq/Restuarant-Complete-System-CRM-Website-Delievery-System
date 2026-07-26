@@ -108,9 +108,9 @@ export default function CheckoutPage() {
       setOrderNumber(data.orderNumber);
       setIsSuccess(true);
       clearCart();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to place order:", error);
-      alert("Failed to place order. Please try again.");
+      alert(error.message || "Failed to place order. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

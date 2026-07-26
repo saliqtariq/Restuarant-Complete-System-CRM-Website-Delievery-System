@@ -41,8 +41,18 @@ async function resolveUnitPrice(name: string): Promise<{ price: number; image: s
     .ilike("name", name.trim())
     .maybeSingle();
 
-  // Item not found in DB → reject. Never fall back to client-sent price.
-  if (!menuItem) return null;
+  // If not found in database table, fallback to static CATALOG if present
+  if (!menuItem) {
+    const { getCatalogItem } = await import("@/lib/menu/catalog");
+    const catalogItem = getCatalogItem(name);
+    if (catalogItem) {
+      return {
+        price: catalogItem.price,
+        image: catalogItem.image,
+      };
+    }
+    return null;
+  }
 
   // Item marked unavailable → reject
   if (menuItem.is_available === false) return null;

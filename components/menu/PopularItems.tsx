@@ -10,19 +10,19 @@ const popularItems = [
   {
     name: "FAMILY MEALS",
     price: "RS 2450",
-    image: "/FamilyDeal.png",
+    image: "/FamilyDealNobg.png",
     serves: "Serves 4-6 people",
   },
   {
     name: "DUO BOX",
     price: "RS 1590",
-    image: "/DuoboxPic.png",
+    image: "/DuoBoxnoBG.png",
     serves: "Serves 2 persons",
   },
   {
     name: "CRISPY CHICKEN BUCKET",
     price: "RS 1750",
-    image: "/ChickenBucket.png",
+    image: "/Crispy Wings Bucket.png",
     serves: "Serves 2-3 persons",
   },
   {

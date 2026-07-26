@@ -120,9 +120,9 @@ export function CateringRequestsTable({
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       {/* Table Header */}
-      <div className="grid grid-cols-[1.2fr_1fr_1fr_1fr_1.5fr_1fr_120px] gap-4 px-5 py-3 bg-gray-50 border-b border-gray-100 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+      <div className="grid grid-cols-[1.4fr_1fr_1fr_1.1fr_1.8fr_1fr_120px] gap-4 px-6 py-3.5 bg-gray-100/80 border-b border-gray-200 text-xs font-bold text-gray-700 uppercase tracking-wider">
         <span>Customer</span>
         <span>Event Type</span>
         <span>Guests</span>
@@ -136,39 +136,39 @@ export function CateringRequestsTable({
       {requests.map((req) => (
         <div
           key={req.id}
-          className="grid grid-cols-[1.2fr_1fr_1fr_1fr_1.5fr_1fr_120px] gap-4 px-5 py-4 border-b border-gray-50 hover:bg-gray-50/50 transition-colors items-center text-xs"
+          className="grid grid-cols-[1.4fr_1fr_1fr_1.1fr_1.8fr_1fr_120px] gap-4 px-6 py-4 border-b border-gray-100 hover:bg-gray-50/80 transition-colors items-center text-sm"
         >
           {/* Customer */}
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-[#3b1200]/10 flex items-center justify-center text-[#3b1200] shrink-0">
-              <User size={14} />
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-full bg-[#3b1200]/10 flex items-center justify-center text-[#3b1200] shrink-0 font-bold">
+              <User size={16} />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">
+              <p className="text-sm font-bold text-gray-900 truncate">
                 {req.name}
               </p>
-              <p className="text-[11px] text-gray-500 flex items-center gap-1 truncate font-medium">
-                <Phone size={10} className="text-gray-400" />
+              <p className="text-xs text-gray-600 flex items-center gap-1 truncate font-medium">
+                <Phone size={12} className="text-gray-400" />
                 {req.phone}
               </p>
               {req.email && (
-                <p className="text-[10px] text-gray-400 truncate">{req.email}</p>
+                <p className="text-xs text-gray-400 truncate">{req.email}</p>
               )}
             </div>
           </div>
 
           {/* Event Type */}
-          <div className="text-sm text-gray-700 font-medium">{req.event_type}</div>
+          <div className="text-sm text-gray-900 font-semibold">{req.event_type}</div>
 
           {/* Guests */}
-          <div className="flex items-center gap-1.5 text-sm text-gray-600">
-            <Users size={14} className="text-gray-400" />
+          <div className="flex items-center gap-1.5 text-sm text-gray-800 font-medium">
+            <Users size={15} className="text-gray-500" />
             {req.guest_count}
           </div>
 
           {/* Event Date */}
-          <div className="flex items-center gap-1.5 text-sm text-gray-600">
-            <Calendar size={14} className="text-gray-400" />
+          <div className="flex items-center gap-1.5 text-sm text-gray-900 font-medium">
+            <Calendar size={15} className="text-gray-500" />
             {req.event_date
               ? new Date(req.event_date).toLocaleDateString("en-US", {
                   month: "short",
@@ -181,19 +181,19 @@ export function CateringRequestsTable({
           {/* Special Requirements / Notes */}
           <div>
             {req.notes ? (
-              <div className="bg-amber-50/80 border border-amber-200/60 text-amber-900 rounded-lg p-2 text-[11px] leading-snug line-clamp-3">
+              <div className="bg-amber-50 border border-amber-300 text-amber-950 rounded-lg p-2.5 text-xs font-medium leading-relaxed">
                 <span className="font-bold text-amber-950 block text-[10px] uppercase tracking-wider mb-0.5">
-                  Note:
+                  Customer Note:
                 </span>
                 {req.notes}
               </div>
             ) : (
-              <span className="text-gray-400 italic text-[11px]">No extra notes</span>
+              <span className="text-gray-400 italic text-xs">No extra notes</span>
             )}
           </div>
 
           {/* Time ago */}
-          <div className="text-xs text-gray-400">{timeAgo(req.created_at)}</div>
+          <div className="text-xs text-gray-500 font-medium">{timeAgo(req.created_at)}</div>
 
           {/* Status Dropdown */}
           <div className="flex justify-end">

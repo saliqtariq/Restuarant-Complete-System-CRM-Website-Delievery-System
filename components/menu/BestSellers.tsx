@@ -20,7 +20,7 @@ const bestSellers = [
   {
     name: "SAUCY CHICKEN PARATHA",
     price: "RS 670",
-    image: "/SaucyLachParatha.png",
+    image: "/SAUCY CHICKEN PARATHA.png",
   },
   {
     name: "ABRAHAM'S DOUBLE STACK",
@@ -30,12 +30,12 @@ const bestSellers = [
   {
     name: "TWISTER WRAP COMBO",
     price: "RS 760",
-    image: "/TwisterCombo.png",
+    image: "/TwisterComboNoBG.png",
   },
   {
     name: "BURGER N CHICKEN COMBO",
     price: "RS 550",
-    image: "/Burger n Chicken Combo.png",
+    image: "/Burger n Chicken ComboNobg.png",
   },
 ];
 
