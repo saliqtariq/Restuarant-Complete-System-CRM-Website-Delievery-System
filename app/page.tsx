@@ -13,13 +13,13 @@ export default function Home() {
       {/* Join Rewards / Sign In Banner */}
       <section className="w-full bg-white py-6 md:py-8">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-          <a
-            href="#join"
+          <Link
+            href="/reserve"
             className="bg-[#461a0f] text-white px-8 py-2.5 rounded-md text-xl md:text-2xl tracking-wide transition hover:bg-[#34130b]"
             style={{ fontFamily: "var(--font-bebas)" }}
           >
             RESERVE TABLE
-          </a>
+          </Link>
 
           <span
             className="text-[#461a0f] text-xl md:text-2xl"
