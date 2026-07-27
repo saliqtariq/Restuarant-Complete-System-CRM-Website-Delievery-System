@@ -14,7 +14,7 @@ export default async function PickupOrdersPage() {
       </div>
       
       <div className="w-full">
-        <LiveOrdersTable orders={orders} />
+        <LiveOrdersTable orders={orders} filterType="pickup" />
       </div>
     </div>
   );

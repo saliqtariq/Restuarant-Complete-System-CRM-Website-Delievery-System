@@ -14,7 +14,7 @@ export default async function DeliveryOrdersPage() {
       </div>
       
       <div className="w-full">
-        <LiveOrdersTable orders={orders} />
+        <LiveOrdersTable orders={orders} filterType="delivery" />
       </div>
     </div>
   );

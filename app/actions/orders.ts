@@ -121,3 +121,46 @@ export async function getPendingPayments(): Promise<OrderRow[]> {
   }
   return data ?? [];
 }
+
+// ─── Confirmation Queue Actions ───────────────────────────────────────────────
+
+export async function confirmOrder(
+  orderId: string
+): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
+  const { error } = await supabaseAdmin
+    .from("orders")
+    .update({ status: "cooking" })
+    .eq("id", orderId);
+
+  if (error) {
+    console.error("confirmOrder error:", error);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/kds");
+  return { success: true };
+}
+
+export async function rejectOrder(
+  orderId: string,
+  reason?: string
+): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
+  const updates: Record<string, string> = { status: "cancelled" };
+  if (reason) updates.rejection_reason = reason;
+
+  const { error } = await supabaseAdmin
+    .from("orders")
+    .update(updates)
+    .eq("id", orderId);
+
+  if (error) {
+    console.error("rejectOrder error:", error);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/dashboard");
+  return { success: true };
+}

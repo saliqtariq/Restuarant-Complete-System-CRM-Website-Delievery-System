@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import {
   CateringRequestRow,
   CateringRequestStatus,
@@ -25,8 +25,8 @@ const STATUS_CONFIG: Record<
   cancelled: { label: "Cancelled", color: "text-red-700", bg: "bg-red-50 border-red-200" },
 };
 
-function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime();
+function timeAgo(dateStr: string, now: Date) {
+  const diff = now.getTime() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return "Just now";
   if (mins < 60) return `${mins}m ago`;
@@ -103,6 +103,12 @@ export function CateringRequestsTable({
 }: {
   requests: CateringRequestRow[];
 }) {
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(interval);
+  }, []);
   if (requests.length === 0) {
     return (
       <div className="bg-white rounded-xl p-10 shadow-sm border border-gray-100 text-center">
@@ -193,7 +199,7 @@ export function CateringRequestsTable({
           </div>
 
           {/* Time ago */}
-          <div className="text-xs text-gray-500 font-medium">{timeAgo(req.created_at)}</div>
+          <div className="text-xs text-gray-500 font-medium">{timeAgo(req.created_at, now)}</div>
 
           {/* Status Dropdown */}
           <div className="flex justify-end">

@@ -62,6 +62,7 @@ export default async function OrdersPage() {
               orders={groupedOrders[key]} 
               title={key} 
               hideViewAll={true} 
+              realtimeEnabled={key === "Today"}
             />
           ))
         )}

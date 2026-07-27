@@ -8,10 +8,13 @@ import { ReactNode } from "react";
 export function StoreLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   
-  // If we are on the dashboard or admin routes, don't show the store Navbar/Footer
-  const isAdmin = pathname?.startsWith("/dashboard") || pathname?.startsWith("/admin");
+  // If we are on the dashboard, admin, or kds routes, don't show the store Navbar/Footer
+  const isAdminOrKds = 
+    pathname?.startsWith("/dashboard") || 
+    pathname?.startsWith("/admin") || 
+    pathname?.startsWith("/kds");
 
-  if (isAdmin) {
+  if (isAdminOrKds) {
     return <>{children}</>;
   }
 

@@ -1,37 +1,129 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { OrderRow } from "@/app/actions/dashboard";
+import { updateOrderStatus, OrderStatus } from "@/app/actions/orders";
 import { OrderDetailsModal } from "./OrderDetailsModal";
+import { supabase } from "@/backend/supabase";
 
-export function LiveOrdersTable({ 
-  orders, 
-  title = "LIVE ORDERS", 
-  hideViewAll = false 
-}: { 
+const STATUS_CONFIG: Record<
+  string,
+  { text: string; sub: string; dot: string; badge: string }
+> = {
+  pending:          { text: "Awaiting Confirm", sub: "Not sent to kitchen", dot: "bg-gray-400",   badge: "bg-gray-100 text-gray-600" },
+  cooking:          { text: "Preparing",        sub: "In Kitchen",          dot: "bg-orange-500", badge: "bg-orange-100 text-orange-700" },
+  ready:            { text: "Ready",            sub: "Food is done",        dot: "bg-green-500",  badge: "bg-green-100 text-green-700" },
+  out_for_delivery: { text: "Out for Delivery", sub: "On the way",          dot: "bg-blue-500",   badge: "bg-blue-100 text-blue-700" },
+  delivered:        { text: "Delivered",        sub: "Order complete",      dot: "bg-green-700",  badge: "bg-green-100 text-green-800" },
+  cancelled:        { text: "Cancelled",        sub: "Order cancelled",     dot: "bg-red-500",    badge: "bg-red-100 text-red-700" },
+};
+
+function timeAgo(dateStr: string, now: Date) {
+  const diff = Math.floor((now.getTime() - new Date(dateStr).getTime()) / 60000);
+  if (diff < 1) return "Just now";
+  if (diff < 60) return `${diff} mins ago`;
+  const hrs = Math.floor(diff / 60);
+  if (hrs < 24) return `${hrs} hrs ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+// The next logical status for an action button
+function getNextAction(status: string, orderType: string): { label: string; next: OrderStatus } | null {
+  if (status === "ready" && orderType === "delivery") return { label: "Out for Delivery", next: "out_for_delivery" };
+  if (status === "ready" && orderType === "pickup")   return { label: "Mark Picked Up",   next: "delivered" };
+  if (status === "out_for_delivery")                  return { label: "Mark Delivered",   next: "delivered" };
+  return null;
+}
+
+export function LiveOrdersTable({
+  orders: initialOrders,
+  title = "LIVE ORDERS",
+  hideViewAll = false,
+  realtimeEnabled = true, // Default to true for instant live updates across all dashboard views
+  filterType,
+}: {
   orders: OrderRow[];
   title?: string;
   hideViewAll?: boolean;
+  realtimeEnabled?: boolean;
+  filterType?: "pickup" | "delivery" | "all";
 }) {
+  const [orders, setOrders] = useState<OrderRow[]>(() =>
+    filterType && filterType !== "all"
+      ? initialOrders.filter((o) => o.order_type === filterType)
+      : initialOrders
+  );
   const [selectedOrder, setSelectedOrder] = useState<OrderRow | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [now, setNow] = useState(new Date());
 
-  const getStatusDisplay = (status: string, orderType: string) => {
-    switch (status) {
-      case "pending":
-        return { text: "Pending", sub: "Waiting for confirmation", color: "bg-gray-400" };
-      case "cooking":
-        return { text: "Preparing", sub: "In Kitchen", color: "bg-orange-500" };
-      case "ready":
-        return { text: "Ready for Pickup", sub: "Customer can arrive", color: "bg-green-500" };
-      case "out_for_delivery":
-        return { text: "Out for Delivery", sub: "On the way", color: "bg-blue-500" };
-      case "delivered":
-        return { text: "Completed", sub: orderType === "pickup" ? "Picked up" : "Delivered", color: "bg-green-700" };
-      case "cancelled":
-        return { text: "Cancelled", sub: "Order cancelled", color: "bg-red-500" };
-      default:
-        return { text: status, sub: "", color: "bg-gray-400" };
-    }
+  // Sync with server re-renders (for the dashboard widget case)
+  useEffect(() => {
+    setOrders(
+      filterType && filterType !== "all"
+        ? initialOrders.filter((o) => o.order_type === filterType)
+        : initialOrders
+    );
+  }, [initialOrders, filterType]);
+
+  // Tick every minute for relative time strings
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Fetch fresh orders from the API
+  const fetchOrders = useCallback(async () => {
+    try {
+      const url =
+        filterType && filterType !== "all"
+          ? `/api/dashboard/orders?type=${filterType}`
+          : "/api/dashboard/orders";
+      const res = await fetch(url, { cache: "no-store" });
+      if (res.ok) {
+        let data: OrderRow[] = await res.json();
+        if (filterType && filterType !== "all") {
+          data = data.filter((o) => o.order_type === filterType);
+        }
+        setOrders(data);
+        // Also update the selected order if it's open
+        setSelectedOrder((prev) => (prev ? data.find((o) => o.id === prev.id) ?? prev : null));
+      }
+    } catch {}
+  }, [filterType]);
+
+  // Realtime Supabase subscription + 3-second auto-poll fallback
+  useEffect(() => {
+    if (!realtimeEnabled) return;
+    
+    // Initial fetch
+    fetchOrders();
+
+    // 3-second auto-poll loop so status updates (e.g. KDS mark ready) show live without page refresh
+    const pollInterval = setInterval(fetchOrders, 3000);
+
+    const channel = supabase
+      .channel("dashboard:orders")
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => {
+        fetchOrders();
+      })
+      .subscribe();
+
+    return () => {
+      clearInterval(pollInterval);
+      supabase.removeChannel(channel);
+    };
+  }, [realtimeEnabled, fetchOrders]);
+
+  // Optimistic status bump
+  const handleStatusBump = async (order: OrderRow, next: OrderStatus) => {
+    setUpdatingId(order.id);
+    // Optimistic update
+    setOrders((prev) =>
+      prev.map((o) => (o.id === order.id ? { ...o, status: next } : o))
+    );
+    await updateOrderStatus(order.id, next);
+    setUpdatingId(null);
   };
 
   return (
@@ -39,7 +131,9 @@ export function LiveOrdersTable({
       <div className="flex justify-between items-center px-5 py-4 border-b border-gray-100">
         <h3 className="font-bold text-gray-900 text-sm tracking-wide uppercase">{title}</h3>
         {!hideViewAll && (
-          <button className="text-[#E63946] text-xs font-bold hover:underline">View All Orders</button>
+          <a href="/dashboard/orders" className="text-[#E63946] text-xs font-bold hover:underline">
+            View All Orders
+          </a>
         )}
       </div>
 
@@ -57,52 +151,70 @@ export function LiveOrdersTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {orders.map((order, i) => {
-              const statusDisplay = getStatusDisplay(order.status, order.order_type);
-              
-              // Calculate time elapsed
-              const createdDate = new Date(order.created_at);
-              const now = new Date();
-              const diffMins = Math.floor((now.getTime() - createdDate.getTime()) / 60000);
-              const timeString = diffMins < 60 ? `${diffMins} mins ago` : `${Math.floor(diffMins/60)} hrs ago`;
+            {orders.map((order) => {
+              const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
+              const nextAction = getNextAction(order.status, order.order_type);
+              const isUpdating = updatingId === order.id;
 
               return (
-                <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
+                <tr
+                  key={order.id}
+                  className="hover:bg-gray-50/50 transition-colors"
+                >
                   <td className="px-5 py-3.5 font-bold text-gray-900">{order.order_number}</td>
                   <td className="px-5 py-3.5">
                     <div className="font-bold text-gray-900 text-[12px]">{order.customer_name}</div>
                     <div className="text-gray-400 text-[10px]">{order.phone}</div>
                   </td>
                   <td className="px-5 py-3.5">
-                    <span className={`px-2 py-0.5 text-[10px] font-bold rounded border uppercase ${
-                      order.order_type === "pickup"
-                        ? "bg-orange-50 text-orange-600 border-orange-200"
-                        : "bg-green-50 text-green-600 border-green-200"
-                    }`}>
+                    <span
+                      className={`px-2 py-0.5 text-[10px] font-bold rounded border uppercase ${
+                        order.order_type === "pickup"
+                          ? "bg-orange-50 text-orange-600 border-orange-200"
+                          : "bg-green-50 text-green-600 border-green-200"
+                      }`}
+                    >
                       {order.order_type}
                     </span>
                   </td>
                   <td className="px-5 py-3.5">
-                    <div className={`font-bold text-[11px] text-gray-900`}>
-                      Rs {order.grand_total}
-                    </div>
+                    <div className="font-bold text-[11px] text-gray-900">Rs {order.grand_total}</div>
                     <div className="text-gray-400 text-[10px] uppercase">{order.payment_method}</div>
                   </td>
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-1.5 mb-0.5">
-                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${statusDisplay.color}`}></span>
-                      <span className="font-bold text-gray-900 text-[11px]">{statusDisplay.text}</span>
+                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${cfg.dot} ${order.status === "cooking" ? "animate-pulse" : ""}`} />
+                      <span className="font-bold text-gray-900 text-[11px]">{cfg.text}</span>
                     </div>
-                    <div className="text-gray-400 text-[10px] pl-3">{statusDisplay.sub}</div>
+                    <div className="text-gray-400 text-[10px] pl-3">{cfg.sub}</div>
                   </td>
-                  <td className="px-5 py-3.5 text-gray-400 font-medium">{timeString}</td>
-                  <td className="px-5 py-3.5 text-center">
-                    <button 
-                      onClick={() => setSelectedOrder(order)}
-                      className="text-[#E63946] border border-[#E63946]/40 hover:bg-red-50 font-bold px-3 py-1 rounded text-[10px] transition-colors"
-                    >
-                      View
-                    </button>
+                  <td className="px-5 py-3.5 text-gray-400 font-medium">
+                    {timeAgo(order.created_at, now)}
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <div className="flex items-center justify-center gap-1.5">
+                      {/* Action button for status progression */}
+                      {nextAction && (
+                        <button
+                          onClick={() => handleStatusBump(order, nextAction.next)}
+                          disabled={isUpdating}
+                          className={`text-[10px] font-bold px-2.5 py-1.5 rounded transition-colors whitespace-nowrap ${
+                            nextAction.next === "out_for_delivery"
+                              ? "bg-blue-600 hover:bg-blue-700 text-white"
+                              : "bg-green-600 hover:bg-green-700 text-white"
+                          } disabled:opacity-50`}
+                        >
+                          {isUpdating ? "…" : nextAction.label}
+                        </button>
+                      )}
+                      {/* View details */}
+                      <button
+                        onClick={() => setSelectedOrder(order)}
+                        className="text-[#E63946] border border-[#E63946]/40 hover:bg-red-50 font-bold px-3 py-1 rounded text-[10px] transition-colors"
+                      >
+                        View
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -112,10 +224,10 @@ export function LiveOrdersTable({
       </div>
 
       {selectedOrder && (
-        <OrderDetailsModal 
-          isOpen={true} 
-          onClose={() => setSelectedOrder(null)} 
-          order={selectedOrder} 
+        <OrderDetailsModal
+          isOpen={true}
+          onClose={() => setSelectedOrder(null)}
+          order={selectedOrder}
         />
       )}
     </div>

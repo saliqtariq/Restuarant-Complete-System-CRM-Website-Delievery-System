@@ -22,6 +22,17 @@ export type OrderRow = {
   created_at: string;
 };
 
+export type ConfirmationOrderItem = {
+  id: string;
+  item_name: string;
+  quantity: number;
+  price: string;
+};
+
+export type ConfirmationOrderRow = OrderRow & {
+  order_items: ConfirmationOrderItem[];
+};
+
 export type DashboardSummary = {
   todayRevenue: number;
   yesterdayRevenue: number;
@@ -292,4 +303,21 @@ export async function getPaymentMethodBreakdown(): Promise<PaymentBreakdown[]> {
   }
 
   return Object.entries(map).map(([method, total]) => ({ method, total }));
+}
+
+// ─── Pending Confirmation Queue ───────────────────────────────────────────────
+
+export async function getPendingConfirmationOrders(): Promise<ConfirmationOrderRow[]> {
+  await requireAdmin();
+  const { data, error } = await supabaseAdmin
+    .from("orders")
+    .select(`*, order_items(*)`)
+    .eq("status", "pending")
+    .order("created_at", { ascending: true }); // oldest first so urgent ones are at the top
+
+  if (error) {
+    console.error("getPendingConfirmationOrders error:", error);
+    return [];
+  }
+  return (data ?? []) as ConfirmationOrderRow[];
 }

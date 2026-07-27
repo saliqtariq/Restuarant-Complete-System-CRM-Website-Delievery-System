@@ -2,6 +2,7 @@ import { SummaryCards } from "@/components/admin/widgets/SummaryCards";
 import { LiveOrdersTable } from "@/components/admin/widgets/LiveOrdersTable";
 import { RightSidebarWidgets } from "@/components/admin/widgets/RightSidebarWidgets";
 import { AnalyticsWidgets } from "@/components/admin/widgets/AnalyticsWidgets";
+import { OrderConfirmationQueue } from "@/components/admin/widgets/OrderConfirmationQueue";
 import {
   getDashboardSummary,
   getLiveOrders,
@@ -10,6 +11,7 @@ import {
   getSalesOverview,
   getTopSellingItems,
   getPaymentMethodBreakdown,
+  getPendingConfirmationOrders,
 } from "@/app/actions/dashboard";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +26,7 @@ export default async function DashboardPage() {
     salesOverview,
     topItems,
     paymentBreakdown,
+    pendingConfirmation,
   ] = await Promise.all([
     getDashboardSummary(),
     getLiveOrders(),
@@ -32,10 +35,14 @@ export default async function DashboardPage() {
     getSalesOverview(),
     getTopSellingItems(),
     getPaymentMethodBreakdown(),
+    getPendingConfirmationOrders(),
   ]);
 
   return (
     <div className="flex flex-col gap-6 pb-12">
+      {/* ── Confirmation Queue — always at the very top ── */}
+      <OrderConfirmationQueue initialOrders={pendingConfirmation} />
+
       {/* Top row: Summary Cards */}
       <SummaryCards summary={summary} />
 
