@@ -166,11 +166,11 @@ export function LiveOrdersTable({
               return (
                 <tr
                   key={order.id}
-                  className="hover:bg-gray-50/50 transition-colors"
+                  className="hover:bg-gray-50/50 transition-colors whitespace-nowrap"
                 >
                   <td className="px-5 py-3.5 font-bold text-gray-900">{order.order_number}</td>
                   <td className="px-5 py-3.5">
-                    <div className="font-bold text-gray-900 text-[12px]">{order.customer_name}</div>
+                    <div className="font-bold text-gray-900 text-[12px] truncate max-w-[120px]">{order.customer_name}</div>
                     <div className="text-gray-400 text-[10px]">{order.phone}</div>
                   </td>
                   <td className="px-5 py-3.5">
@@ -196,7 +196,7 @@ export function LiveOrdersTable({
                     <div className="text-gray-400 text-[10px] pl-3">{cfg.sub}</div>
                     {order.driver && order.order_type === "delivery" && order.status !== "delivered" && (
                       <div className="mt-1 pl-3 flex items-center gap-1 text-[10px] text-blue-600">
-                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                        <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                         <span className="font-medium truncate max-w-[80px]" title={order.driver.name}>{order.driver.name}</span>
                       </div>
                     )}
@@ -205,7 +205,7 @@ export function LiveOrdersTable({
                     {timeAgo(order.created_at, now)}
                   </td>
                   <td className="px-5 py-3.5">
-                    <div className="flex items-center justify-center gap-1.5">
+                    <div className="flex items-center gap-1.5">
                       {/* Action button for status progression */}
                       {nextAction && (
                         <button
@@ -223,7 +223,7 @@ export function LiveOrdersTable({
                       {/* View details */}
                       <button
                         onClick={() => setSelectedOrder(order)}
-                        className="text-[#E63946] border border-[#E63946]/40 hover:bg-red-50 font-bold px-3 py-1 rounded text-[10px] transition-colors"
+                        className="text-[#E63946] border border-[#E63946]/40 hover:bg-red-50 font-bold px-3 py-1.5 rounded text-[10px] transition-colors whitespace-nowrap"
                       >
                         View
                       </button>
@@ -232,7 +232,7 @@ export function LiveOrdersTable({
                       {order.status === "out_for_delivery" && order.order_type === "delivery" && (
                         <button
                           onClick={() => setOrderToDispatch(order)}
-                          className="text-[#128C7E] border border-[#128C7E]/40 hover:bg-[#128C7E]/10 font-bold px-2 py-1 rounded transition-colors flex items-center justify-center"
+                          className="text-[#128C7E] border border-[#128C7E]/40 hover:bg-[#128C7E]/10 font-bold px-2 py-1.5 rounded transition-colors flex items-center justify-center whitespace-nowrap"
                           title="Resend WhatsApp or Reassign Driver"
                         >
                           <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21"/><path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1Z"/><path d="M14 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1Z"/><path d="M9.5 13.5c1.5 1 3.5 1 5 0"/></svg>

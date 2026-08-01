@@ -160,38 +160,38 @@ function ConfirmationCard({
   return (
     <div
       className={`
-        bg-white rounded-2xl border shadow-lg overflow-hidden
-        transition-all duration-500 ease-in-out
+        bg-white rounded-[20px] border shadow-sm hover:shadow-md overflow-hidden
+        transition-all duration-500 ease-in-out flex flex-col
         ${isRemoving ? "opacity-0 scale-90 max-h-0 my-0 py-0" : "opacity-100 scale-100 max-h-[1000px]"}
-        ${isUrgent ? "border-red-300 shadow-red-100" : "border-gray-200"}
+        ${isUrgent ? "border-red-200 shadow-red-50" : "border-gray-100"}
       `}
     >
       {/* Top bar */}
       <div
-        className={`flex items-center justify-between px-5 py-3 ${
-          isUrgent ? "bg-red-50" : "bg-gray-50"
-        } border-b ${isUrgent ? "border-red-200" : "border-gray-100"}`}
+        className={`flex items-center justify-between px-5 py-3.5 ${
+          isUrgent ? "bg-red-50/50" : "bg-gray-50/50"
+        } border-b ${isUrgent ? "border-red-100" : "border-gray-100"}`}
       >
         <div className="flex items-center gap-3">
           <div
-            className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+            className={`w-9 h-9 rounded-full flex items-center justify-center ${
               order.order_type === "pickup"
                 ? "bg-orange-100 text-orange-600"
                 : "bg-blue-100 text-blue-600"
             }`}
           >
             {order.order_type === "pickup" ? (
-              <ShoppingBag size={16} />
+              <ShoppingBag size={16} strokeWidth={2.5} />
             ) : (
-              <Truck size={16} />
+              <Truck size={16} strokeWidth={2.5} />
             )}
           </div>
           <div>
-            <span className="font-extrabold text-gray-900 text-base">
+            <span className="font-extrabold text-gray-900 text-[15px] tracking-tight">
               #{order.order_number}
             </span>
             <span
-              className={`ml-2 text-xs font-bold uppercase px-2 py-0.5 rounded-full ${
+              className={`ml-2 text-[10px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider ${
                 order.order_type === "pickup"
                   ? "bg-orange-100 text-orange-700"
                   : "bg-blue-100 text-blue-700"
@@ -202,77 +202,82 @@ function ConfirmationCard({
           </div>
         </div>
         <div
-          className={`flex items-center gap-1.5 text-xs font-semibold ${
-            isUrgent ? "text-red-600" : "text-gray-500"
+          className={`flex items-center gap-1.5 text-xs font-bold ${
+            isUrgent ? "text-red-500" : "text-gray-400"
           }`}
         >
-          {isUrgent && <AlertTriangle size={13} />}
-          <Clock size={13} />
+          {isUrgent && <AlertTriangle size={14} className="animate-pulse" />}
+          <Clock size={14} />
           <span suppressHydrationWarning>{timeWaiting(order.created_at)}</span>
         </div>
       </div>
 
-      <div className="p-5">
-        {/* Customer info — big & prominent so operator can call immediately */}
-        <div className="mb-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-            Customer — Call to Verify
-          </p>
+      <div className="p-5 flex-1 flex flex-col">
+        {/* Customer info */}
+        <div className="mb-5 pb-5 border-b border-gray-100">
           <div className="flex items-center justify-between gap-4">
-            <p className="font-bold text-gray-900 text-lg">{order.customer_name}</p>
+            <div>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
+                Customer
+              </p>
+              <p className="font-bold text-gray-900 text-[17px] leading-none">{order.customer_name}</p>
+              {order.order_type === "delivery" && order.delivery_address && (
+                <div className="flex items-start gap-1 mt-2 text-[13px] text-gray-500 font-medium">
+                  <MapPin size={14} className="mt-0.5 shrink-0 text-gray-400" />
+                  <span className="leading-tight">{order.delivery_address}, {order.city}</span>
+                </div>
+              )}
+            </div>
             <a
               href={`tel:${order.phone}`}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-bold transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 rounded-lg text-sm font-bold transition-colors"
             >
-              <Phone size={15} />
+              <Phone size={14} strokeWidth={2.5} />
               {order.phone}
             </a>
           </div>
-          {order.order_type === "delivery" && order.delivery_address && (
-            <div className="flex items-start gap-1.5 mt-2 text-sm text-gray-500">
-              <MapPin size={14} className="mt-0.5 shrink-0" />
-              <span>{order.delivery_address}, {order.city}</span>
-            </div>
-          )}
         </div>
 
         {/* Items */}
-        <div className="mb-4">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-            Items Ordered
+        <div className="mb-6 flex-1">
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
+            Order
           </p>
-          <div className="space-y-1.5">
+          <div className="space-y-2.5">
             {order.order_items?.map((item) => (
               <div key={item.id} className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-md bg-gray-100 border border-gray-200 flex items-center justify-center text-xs font-bold text-gray-700 shrink-0">
+                <span className="w-7 h-7 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs font-black shrink-0">
                   {item.quantity}
                 </span>
-                <span className="text-sm font-semibold text-gray-800">{item.item_name}</span>
+                <span className="text-[14px] font-bold text-gray-800 leading-tight">{item.item_name}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Total + payment */}
-        <div className="flex items-center justify-between py-3 border-t border-gray-100 mb-4">
-          <div className="text-sm text-gray-500 font-medium">
-            {order.payment_method?.toUpperCase()}
+        <div className="flex items-end justify-between mb-5">
+          <div>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total</p>
+            <div className="font-black text-gray-900 text-xl leading-none">
+              Rs {Number(order.grand_total).toLocaleString()}
+            </div>
           </div>
-          <div className="font-extrabold text-gray-900 text-lg">
-            Rs {Number(order.grand_total).toLocaleString()}
+          <div className="text-[11px] font-bold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-md uppercase tracking-wider">
+            {order.payment_method?.toUpperCase()}
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3">
+        <div className="flex gap-2.5 mt-auto">
           <button
             onClick={() => {
               startTransition(() => onReject(order));
             }}
             disabled={isPending}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-red-200 text-red-600 hover:bg-red-50 font-bold text-sm transition-colors disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-[14px] bg-white border-2 border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200 hover:text-red-600 font-bold text-sm transition-all disabled:opacity-50"
           >
-            <XCircle size={18} />
+            <XCircle size={18} strokeWidth={2.5} />
             Reject
           </button>
           <button
@@ -280,10 +285,10 @@ function ConfirmationCard({
               startTransition(() => onConfirm(order.id));
             }}
             disabled={isPending}
-            className="flex-[2] flex items-center justify-center gap-2 py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-sm transition-colors disabled:opacity-50 shadow-lg shadow-green-200"
+            className="flex-[1.5] flex items-center justify-center gap-2 py-3 rounded-[14px] bg-[#E63946] hover:bg-[#D62839] text-white font-bold text-sm transition-all disabled:opacity-50 shadow-md shadow-red-200"
           >
-            <ChefHat size={18} />
-            Confirm &amp; Send to Kitchen
+            <ChefHat size={18} strokeWidth={2.5} />
+            Confirm Order
           </button>
         </div>
       </div>
@@ -399,17 +404,17 @@ export function OrderConfirmationQueue({
         />
       )}
 
-      <div className="mb-6">
+      <div className="mb-8">
         {/* Section header */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex items-center gap-2 px-4 py-2 bg-red-600 rounded-xl shadow-lg shadow-red-200">
-            <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping absolute" />
-            <span className="w-2.5 h-2.5 rounded-full bg-white relative" />
-            <span className="font-extrabold text-white text-sm uppercase tracking-wide">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center gap-2 px-4 py-1.5 bg-[#E63946] rounded-xl shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-white animate-ping absolute" />
+            <span className="w-2 h-2 rounded-full bg-white relative" />
+            <span className="font-black text-white text-[11px] uppercase tracking-widest mt-[1px]">
               {orders.length} Order{orders.length > 1 ? "s" : ""} Awaiting Confirmation
             </span>
           </div>
-          <p className="text-xs text-gray-400 font-medium">
+          <p className="text-[12px] text-gray-400 font-medium">
             Call and verify before sending to kitchen
           </p>
         </div>
