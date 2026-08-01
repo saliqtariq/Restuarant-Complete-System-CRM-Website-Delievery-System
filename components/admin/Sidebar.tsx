@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -18,6 +19,7 @@ import {
   Star,
   BarChart3,
   LogOut,
+  X,
 } from "lucide-react";
 
 type SidebarProps = {
@@ -29,6 +31,29 @@ type SidebarProps = {
 };
 export function Sidebar({ counts }: SidebarProps) {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Listen for toggle event from the Header hamburger button
+  useEffect(() => {
+    const handleToggle = () => setMobileOpen((prev) => !prev);
+    window.addEventListener("toggle-admin-sidebar", handleToggle);
+    return () => window.removeEventListener("toggle-admin-sidebar", handleToggle);
+  }, []);
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  // Prevent body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, badge: null },
@@ -46,11 +71,10 @@ export function Sidebar({ counts }: SidebarProps) {
 
   ];
 
-  return (
-    <aside className="w-[220px] shrink-0 bg-[#3B0A0A] text-white flex flex-col h-screen sticky top-0 overflow-y-auto sidebar-scroll">
-
+  const sidebarContent = (
+    <>
       {/* Logo */}
-      <div className="flex items-center justify-center px-4 pt-3 pb-1">
+      <div className="flex items-center justify-between px-4 pt-3 pb-1">
         <Image
           src="/Mainlogotransparent.png"
           alt="Restaurant Logo"
@@ -59,6 +83,14 @@ export function Sidebar({ counts }: SidebarProps) {
           className="object-contain"
           priority
         />
+        {/* Close button — mobile only */}
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="lg:hidden text-white/70 hover:text-white p-1 -mr-1 transition-colors"
+          aria-label="Close sidebar"
+        >
+          <X size={22} />
+        </button>
       </div>
 
       {/* Navigation */}
@@ -97,11 +129,36 @@ export function Sidebar({ counts }: SidebarProps) {
           Logout
         </Link>
       </nav>
-      {/* Bottom spacing — keeps the gap that was previously occupied by the promo card */}
+      {/* Bottom spacing */}
       <div className="p-3 pb-4">
         <div className="rounded-xl" style={{ minHeight: 120 }} />
       </div>
+    </>
+  );
 
-    </aside>
+  return (
+    <>
+      {/* Desktop sidebar — always visible on lg+ */}
+      <aside className="hidden lg:flex w-[220px] shrink-0 bg-[#3B0A0A] text-white flex-col h-screen sticky top-0 overflow-y-auto sidebar-scroll">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile sidebar — slide in from left */}
+      <aside
+        className={`fixed top-0 left-0 h-full w-[260px] bg-[#3B0A0A] text-white flex flex-col z-50 lg:hidden transform transition-transform duration-300 ease-in-out overflow-y-auto sidebar-scroll ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {sidebarContent}
+      </aside>
+    </>
   );
 }

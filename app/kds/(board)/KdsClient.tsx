@@ -15,10 +15,7 @@ import {
 } from "lucide-react";
 
 function parseOrderDate(dateString: string) {
-  // Strip the 'Z' or '+00:00' to force the browser to treat the DB string as Local Time.
-  // This solves the issue where the DB inserts local time but tags it as UTC, putting it 5 hours in the future.
-  const stripped = dateString.replace(/(Z|[+-]\d{2}(:\d{2})?)$/, '');
-  return new Date(stripped);
+  return new Date(dateString);
 }
 
 function formatTimeElapsed(createdAt: string, now: Date) {

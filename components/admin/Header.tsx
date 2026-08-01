@@ -94,7 +94,10 @@ export function Header() {
     <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-6 sticky top-0 z-20">
       {/* Hamburger + Live Search Bar */}
       <div className="flex items-center gap-4 flex-1">
-        <button className="text-gray-500 hover:text-gray-700 transition-colors p-1">
+        <button 
+          onClick={() => window.dispatchEvent(new Event('toggle-admin-sidebar'))}
+          className="lg:hidden text-gray-500 hover:text-gray-700 transition-colors p-1"
+        >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <line x1="3" y1="6" x2="21" y2="6"/>
             <line x1="3" y1="12" x2="21" y2="12"/>

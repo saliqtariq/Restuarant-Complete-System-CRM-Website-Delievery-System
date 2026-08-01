@@ -29,6 +29,7 @@ export default function CheckoutPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
+  const [checkoutError, setCheckoutError] = useState("");
 
   const subtotal = totalPrice();
   const deliveryFee = subtotal > 0 ? 150 : 0;
@@ -101,6 +102,14 @@ export default function CheckoutPage() {
   // ── COD submit ──
   const handleCodSubmit = async () => {
     setIsSubmitting(true);
+    setCheckoutError("");
+
+    // Safety net: auto-reset after 30s in case something hangs
+    const safetyTimeout = setTimeout(() => {
+      setIsSubmitting(false);
+      setCheckoutError("The request timed out. Please try again.");
+    }, 30000);
+
     try {
       // Auto-save user profile fields if authenticated
       if (session) {
@@ -143,8 +152,9 @@ export default function CheckoutPage() {
       clearCart();
     } catch (error: any) {
       console.error("Failed to place order:", error);
-      alert(error.message || "Failed to place order. Please try again.");
+      setCheckoutError(error.message || "Failed to place order. Please try again.");
     } finally {
+      clearTimeout(safetyTimeout);
       setIsSubmitting(false);
     }
   };
@@ -493,6 +503,12 @@ export default function CheckoutPage() {
                     RS {grandTotal.toLocaleString()}
                   </span>
                 </div>
+
+                {checkoutError && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm text-center font-medium">
+                    {checkoutError}
+                  </div>
+                )}
 
                 <button
                   type="submit"
