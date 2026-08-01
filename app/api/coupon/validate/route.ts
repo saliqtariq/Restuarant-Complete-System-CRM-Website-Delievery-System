@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/backend/supabaseServer";
+import { calculateCouponDiscount, isCouponValid } from "@/lib/checkout/coupon";
 import { getClientIp, rateLimit } from "@/lib/security/rateLimit";
 import { readJsonBody } from "@/lib/security/request";
 import { z } from "zod";
@@ -40,26 +41,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid or expired coupon" }, { status: 404 });
     }
 
-    if (coupon.expiry_date && new Date(coupon.expiry_date) < new Date()) {
-      return NextResponse.json({ error: "Coupon has expired" }, { status: 400 });
+    if (!isCouponValid(coupon, subtotal)) {
+      if (coupon.expiry_date && new Date(coupon.expiry_date) < new Date()) {
+        return NextResponse.json({ error: "Coupon has expired" }, { status: 400 });
+      }
+      if (subtotal < coupon.min_order_amount) {
+        return NextResponse.json(
+          { error: `Minimum order amount for this coupon is RS ${coupon.min_order_amount}` },
+          { status: 400 }
+        );
+      }
+      return NextResponse.json({ error: "Invalid or expired coupon" }, { status: 404 });
     }
 
-    if (subtotal < coupon.min_order_amount) {
-      return NextResponse.json(
-        { error: `Minimum order amount for this coupon is RS ${coupon.min_order_amount}` },
-        { status: 400 }
-      );
-    }
-
-    let discountAmount = 0;
-    if (coupon.discount_type === "percentage") {
-      discountAmount = subtotal * (coupon.discount_amount / 100);
-    } else {
-      discountAmount = coupon.discount_amount;
-    }
-
-    // Ensure discount doesn't exceed subtotal
-    discountAmount = Math.min(discountAmount, subtotal);
+    const discountAmount = calculateCouponDiscount(coupon, subtotal);
 
     return NextResponse.json({
       success: true,
@@ -67,14 +62,11 @@ export async function POST(req: Request) {
         code: coupon.code,
         discount_amount: discountAmount,
         original_discount: coupon.discount_amount,
-        type: coupon.discount_type
-      }
+        type: coupon.discount_type,
+      },
     });
   } catch (error) {
     console.error("Coupon Validate API Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

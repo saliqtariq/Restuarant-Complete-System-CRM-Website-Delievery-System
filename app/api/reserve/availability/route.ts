@@ -1,8 +1,19 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/backend/supabaseServer";
+import { countOverlappingBookings, parseTimeToMinutes } from "@/lib/reservations/capacity";
+import { getClientIp, rateLimit } from "@/lib/security/rateLimit";
 
 // GET /api/reserve/availability?date=YYYY-MM-DD
 export async function GET(req: Request) {
+  const ip = getClientIp(req.headers);
+  const limited = await rateLimit(`reserve-availability:${ip}`, 60, 60 * 60 * 1000);
+  if (limited.limited) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429, headers: { "Retry-After": String(limited.retryAfter) } }
+    );
+  }
+
   const { searchParams } = new URL(req.url);
   const date = searchParams.get("date");
 
@@ -10,7 +21,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Invalid or missing date" }, { status: 400 });
   }
 
-  // Fetch config
   const { data: config } = await supabaseAdmin
     .from("restaurant_capacity_config")
     .select("max_tables_per_slot, slot_duration_minutes")
@@ -20,7 +30,6 @@ export async function GET(req: Request) {
   const maxTablesPerSlot = config?.max_tables_per_slot ?? 2;
   const slotDuration = config?.slot_duration_minutes ?? 90;
 
-  // Fetch all active reservations for that date
   const { data: reservations, error } = await supabaseAdmin
     .from("reservations")
     .select("reservation_time")
@@ -31,7 +40,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Failed to fetch availability" }, { status: 500 });
   }
 
-  // Generate all time slots (11:00 – 23:00, every 30 min)
   const slots: {
     time: string;
     tablesBooked: number;
@@ -42,16 +50,13 @@ export async function GET(req: Request) {
   for (let h = 11; h <= 23; h++) {
     for (const m of [0, 30]) {
       const timeStr = `${String(h).padStart(2, "0")}:${m === 0 ? "00" : "30"}`;
-      const slotMinutes = h * 60 + m;
-      const windowStart = slotMinutes - slotDuration;
-      const windowEnd   = slotMinutes + slotDuration;
+      const slotMinutes = parseTimeToMinutes(timeStr);
 
-      // Count bookings whose time overlaps with this slot's window
-      const tablesBooked = (reservations ?? []).filter((r) => {
-        const [rh, rm] = r.reservation_time.split(":").map(Number);
-        const rMins = rh * 60 + rm;
-        return rMins > windowStart && rMins < windowEnd;
-      }).length;
+      const tablesBooked = countOverlappingBookings(
+        reservations ?? [],
+        slotMinutes,
+        slotDuration
+      );
 
       const tablesRemaining = Math.max(0, maxTablesPerSlot - tablesBooked);
       slots.push({

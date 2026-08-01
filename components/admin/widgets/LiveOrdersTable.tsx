@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { OrderRow } from "@/app/actions/dashboard";
 import { updateOrderStatus, OrderStatus } from "@/app/actions/orders";
 import { OrderDetailsModal } from "./OrderDetailsModal";
+import { DriverDispatchModal } from "./DriverDispatchModal";
 import { supabase } from "@/backend/supabase";
 
 const STATUS_CONFIG: Record<
@@ -54,6 +55,7 @@ export function LiveOrdersTable({
       : initialOrders
   );
   const [selectedOrder, setSelectedOrder] = useState<OrderRow | null>(null);
+  const [orderToDispatch, setOrderToDispatch] = useState<OrderRow | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [now, setNow] = useState(new Date());
 
@@ -117,6 +119,11 @@ export function LiveOrdersTable({
 
   // Optimistic status bump
   const handleStatusBump = async (order: OrderRow, next: OrderStatus) => {
+    if (next === "out_for_delivery") {
+      setOrderToDispatch(order);
+      return;
+    }
+
     setUpdatingId(order.id);
     // Optimistic update
     setOrders((prev) =>
@@ -187,8 +194,14 @@ export function LiveOrdersTable({
                       <span className="font-bold text-gray-900 text-[11px]">{cfg.text}</span>
                     </div>
                     <div className="text-gray-400 text-[10px] pl-3">{cfg.sub}</div>
+                    {order.driver && order.order_type === "delivery" && order.status !== "delivered" && (
+                      <div className="mt-1 pl-3 flex items-center gap-1 text-[10px] text-blue-600">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                        <span className="font-medium truncate max-w-[80px]" title={order.driver.name}>{order.driver.name}</span>
+                      </div>
+                    )}
                   </td>
-                  <td className="px-5 py-3.5 text-gray-400 font-medium">
+                  <td className="px-5 py-3.5 text-gray-400 font-medium" suppressHydrationWarning>
                     {timeAgo(order.created_at, now)}
                   </td>
                   <td className="px-5 py-3.5">
@@ -214,6 +227,17 @@ export function LiveOrdersTable({
                       >
                         View
                       </button>
+                      
+                      {/* Re-dispatch / Resend WhatsApp */}
+                      {order.status === "out_for_delivery" && order.order_type === "delivery" && (
+                        <button
+                          onClick={() => setOrderToDispatch(order)}
+                          className="text-[#128C7E] border border-[#128C7E]/40 hover:bg-[#128C7E]/10 font-bold px-2 py-1 rounded transition-colors flex items-center justify-center"
+                          title="Resend WhatsApp or Reassign Driver"
+                        >
+                          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21"/><path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1Z"/><path d="M14 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1Z"/><path d="M9.5 13.5c1.5 1 3.5 1 5 0"/></svg>
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -228,6 +252,19 @@ export function LiveOrdersTable({
           isOpen={true}
           onClose={() => setSelectedOrder(null)}
           order={selectedOrder}
+        />
+      )}
+
+      {orderToDispatch && (
+        <DriverDispatchModal
+          isOpen={true}
+          onClose={() => setOrderToDispatch(null)}
+          order={orderToDispatch}
+          onDispatchComplete={() => {
+            // It was already handled by the server action
+            setOrderToDispatch(null);
+            fetchOrders();
+          }}
         />
       )}
     </div>

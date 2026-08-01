@@ -11,7 +11,8 @@ type Bucket = {
 };
 
 const buckets = new Map<string, Bucket>();
-let redisRateLimiter: Ratelimit | null = null;
+const redisLimiters = new Map<string, Ratelimit>();
+let redisClient: Redis | null = null;
 let redisInitError: string | null = null;
 
 export type RateLimitResult = {
@@ -33,8 +34,8 @@ export function getClientIp(headers: HeaderReader): string {
   );
 }
 
-function getRedisRateLimiter(): Ratelimit | null {
-  if (redisRateLimiter) return redisRateLimiter;
+function getRedisClient(): Redis | null {
+  if (redisClient) return redisClient;
   if (redisInitError) return null;
 
   const url = process.env.UPSTASH_REDIS_REST_URL;
@@ -46,16 +47,33 @@ function getRedisRateLimiter(): Ratelimit | null {
   }
 
   try {
-    redisRateLimiter = new Ratelimit({
-      redis: new Redis({
-        url,
-        token,
-      }),
-      limiter: Ratelimit.slidingWindow(20, "1 m"),
-      prefix: "demorestaurant:ratelimit",
+    redisClient = new Redis({ url, token });
+    return redisClient;
+  } catch (error) {
+    redisInitError = error instanceof Error ? error.message : "Redis rate limiter unavailable";
+    return null;
+  }
+}
+
+function getRedisRateLimiter(limit: number, windowMs: number): Ratelimit | null {
+  const client = getRedisClient();
+  if (!client) return null;
+
+  const windowSec = Math.max(1, Math.ceil(windowMs / 1000));
+  const cacheKey = `${limit}:${windowSec}`;
+
+  const existing = redisLimiters.get(cacheKey);
+  if (existing) return existing;
+
+  try {
+    const limiter = new Ratelimit({
+      redis: client,
+      limiter: Ratelimit.slidingWindow(limit, `${windowSec} s`),
+      prefix: `demorestaurant:ratelimit:${cacheKey}`,
       analytics: false,
     });
-    return redisRateLimiter;
+    redisLimiters.set(cacheKey, limiter);
+    return limiter;
   } catch (error) {
     redisInitError = error instanceof Error ? error.message : "Redis rate limiter unavailable";
     return null;
@@ -67,7 +85,7 @@ export async function rateLimit(
   limit: number,
   windowMs: number
 ): Promise<RateLimitResult> {
-  const redisLimiter = getRedisRateLimiter();
+  const redisLimiter = getRedisRateLimiter(limit, windowMs);
   if (redisLimiter) {
     const result = await redisLimiter.limit(key);
     return {
@@ -77,10 +95,11 @@ export async function rateLimit(
   }
 
   const now = Date.now();
-  const current = buckets.get(key);
+  const bucketKey = `${key}:${limit}:${windowMs}`;
+  const current = buckets.get(bucketKey);
 
   if (!current || current.resetAt <= now) {
-    buckets.set(key, { count: 1, resetAt: now + windowMs });
+    buckets.set(bucketKey, { count: 1, resetAt: now + windowMs });
     cleanupBuckets(now);
     return { limited: false, retryAfter: 0 };
   }

@@ -14,10 +14,15 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-// ── helpers ───────────────────────────────────────────────────────────────────
+function parseOrderDate(dateString: string) {
+  // Strip the 'Z' or '+00:00' to force the browser to treat the DB string as Local Time.
+  // This solves the issue where the DB inserts local time but tags it as UTC, putting it 5 hours in the future.
+  const stripped = dateString.replace(/(Z|[+-]\d{2}(:\d{2})?)$/, '');
+  return new Date(stripped);
+}
 
 function formatTimeElapsed(createdAt: string, now: Date) {
-  const diff = Math.max(0, now.getTime() - new Date(createdAt).getTime());
+  const diff = Math.max(0, now.getTime() - parseOrderDate(createdAt).getTime());
   const mins = Math.floor(diff / 60000);
   const secs = Math.floor((diff % 60000) / 1000);
   return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
@@ -37,7 +42,7 @@ function KdsTicket({
   isRemoving: boolean;
 }) {
   const elapsedMins = Math.floor(
-    (now.getTime() - new Date(order.created_at).getTime()) / 60000
+    (now.getTime() - parseOrderDate(order.created_at).getTime()) / 60000
   );
   const isDelayed = elapsedMins >= 15;
 

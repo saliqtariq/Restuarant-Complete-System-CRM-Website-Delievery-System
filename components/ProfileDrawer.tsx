@@ -25,7 +25,13 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
   const [gender, setGender] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
   const [activeView, setActiveView] = useState<"main" | "orders" | "favorites" | "cards">("main");
+  
+  // Orders State
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
 
   // Initialize form state when user changes or drawer opens
   useEffect(() => {
@@ -36,12 +42,32 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
       setPhone(user.user_metadata.phone || "");
       setDob(user.user_metadata.dob || "");
       setGender(user.user_metadata.gender || "");
+      setAddress(user.user_metadata.address || "");
+      setCity(user.user_metadata.city || "");
       setAvatarFile(null);
       setAvatarPreview(null);
     }, 0);
 
     return () => window.clearTimeout(id);
   }, [user, isOpen]);
+
+  // Fetch orders when orders view is active
+  useEffect(() => {
+    if (activeView === "orders" && user) {
+      setLoadingOrders(true);
+      supabase
+        .from("orders")
+        .select("order_number, created_at, grand_total, status")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .then(({ data, error }) => {
+          if (!error && data) {
+            setOrders(data);
+          }
+          setLoadingOrders(false);
+        });
+    }
+  }, [activeView, user]);
 
   const fullName = `${user?.user_metadata?.first_name || ""} ${user?.user_metadata?.last_name || ""}`.trim() || "PROFILE";
   const initial = fullName.charAt(0).toUpperCase() || "U";
@@ -91,6 +117,8 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
         phone: phone,
         dob: dob,
         gender: gender,
+        address: address,
+        city: city,
         avatar_url: avatarUrl,
       }
     });
@@ -264,6 +292,27 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
                   </div>
                 </div>
 
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-black mb-1 font-medium">City</label>
+                    <input 
+                      type="text" 
+                      value={city} 
+                      onChange={(e) => setCity(e.target.value)}
+                      className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm text-black focus:outline-none focus:border-[#e5002a]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-black mb-1 font-medium">Address</label>
+                    <input 
+                      type="text" 
+                      value={address} 
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm text-black focus:outline-none focus:border-[#e5002a]"
+                    />
+                  </div>
+                </div>
+
                 <div className="flex gap-2 mt-2">
                   <button 
                     type="button"
@@ -294,10 +343,7 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
               <FileText className="text-[#4a1c10]" size={24} />
               <span className="text-xl text-black font-medium tracking-wide">Order History</span>
             </button>
-            <button className="flex items-center gap-4 px-6 py-5 hover:bg-gray-50 transition-colors w-full text-left cursor-pointer">
-              <MapPin className="text-[#4a1c10]" size={24} />
-              <span className="text-xl text-black font-medium tracking-wide">My Address</span>
-            </button>
+
             <button 
               onClick={() => setActiveView("cards")}
               className="flex items-center gap-4 px-6 py-5 hover:bg-gray-50 transition-colors w-full text-left cursor-pointer"
@@ -329,21 +375,56 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
                 </h3>
               </div>
               
-              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-                <h4 className="text-2xl font-bold text-black mb-8 tracking-tight" style={{ fontFamily: "var(--font-bebas)" }}>
-                  No Order Found? Start Ordering
-                </h4>
-                <button 
-                  onClick={() => {
-                    onClose();
-                    // Optional: You could navigate or scroll to the menu here
-                  }}
-                  className="bg-[#e5002a] text-white px-8 py-3 rounded-md font-bold uppercase tracking-wider hover:bg-[#c40024] transition-colors"
-                >
-                  EXPLORE MENU
-                </button>
+              <div className="flex-1 flex flex-col p-6 overflow-y-auto">
+                {loadingOrders ? (
+                  <div className="flex flex-col items-center justify-center flex-1">
+                    <Loader2 className="animate-spin text-[#e5002a] mb-4" size={32} />
+                    <p className="text-gray-500">Loading orders...</p>
+                  </div>
+                ) : orders.length === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center">
+                    <h4 className="text-2xl font-bold text-black mb-8 tracking-tight" style={{ fontFamily: "var(--font-bebas)" }}>
+                      No Order Found? Start Ordering
+                    </h4>
+                    <button 
+                      onClick={() => {
+                        onClose();
+                      }}
+                      className="bg-[#e5002a] text-white px-8 py-3 rounded-md font-bold uppercase tracking-wider hover:bg-[#c40024] transition-colors"
+                    >
+                      EXPLORE MENU
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    {orders.map((order, idx) => (
+                      <div key={idx} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="text-black font-bold uppercase">{order.order_number}</p>
+                            <p className="text-xs text-gray-500">
+                              {new Date(order.created_at).toLocaleDateString()} {new Date(order.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                            </p>
+                          </div>
+                          <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase ${
+                            order.status === 'delivered' ? 'bg-green-100 text-green-700' :
+                            order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                            'bg-orange-100 text-orange-700'
+                          }`}>
+                            {order.status.replace("_", " ")}
+                          </span>
+                        </div>
+                        <div className="pt-2 border-t border-gray-100 flex justify-between items-center mt-2">
+                          <span className="text-sm text-gray-600">Total</span>
+                          <span className="text-base font-bold text-[#e5002a]">Rs {order.grand_total}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
+
           ) : activeView === "favorites" ? (
             /* Favorites View */
             <div className="flex-1 flex flex-col bg-[#f4f4f4] min-h-full">

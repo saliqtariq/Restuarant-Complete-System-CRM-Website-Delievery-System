@@ -28,6 +28,7 @@ export type MenuItem = {
 // ─── Categories ───────────────────────────────────────────────────────────────
 
 export async function getMenuCategories(): Promise<MenuCategory[]> {
+  await requireAdmin();
   const { data, error } = await supabaseAdmin
     .from("menu_categories")
     .select("*")
@@ -95,6 +96,7 @@ export async function deleteMenuCategory(
 // ─── Items ────────────────────────────────────────────────────────────────────
 
 export async function getMenuItems(categoryId?: string): Promise<MenuItem[]> {
+  await requireAdmin();
   let query = supabaseAdmin
     .from("menu_items")
     .select("*")

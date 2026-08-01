@@ -56,16 +56,25 @@ export function OrderNotificationProvider({ children }: { children: ReactNode })
 
       setNotifications((prev) => {
         const existingIds = new Set(prev.map((n) => n.id));
-        const filteredNew = formatted.filter((n) => !existingIds.has(n.id));
+        const filteredNew = formatted.filter((n) => {
+          if (existingIds.has(n.id)) return false;
+          existingIds.add(n.id); // Prevent duplicates within formatted itself
+          return true;
+        });
 
         if (filteredNew.length > 0) {
-          setToasts((tPrev) => [...filteredNew, ...tPrev]);
-          // Automatically refresh the Next.js server data so table updates without manual refresh!
-          router.refresh();
+          setToasts((tPrev) => {
+            const tIds = new Set(tPrev.map((t) => t.id));
+            const newToasts = filteredNew.filter((n) => !tIds.has(n.id));
+            return [...newToasts, ...tPrev];
+          });
           return [...filteredNew, ...prev].slice(0, 50);
         }
         return prev;
       });
+
+      // Call router.refresh outside of React render/state updater phase
+      router.refresh();
 
       const newestTime = newOrders.reduce(
         (max, item) => (new Date(item.created_at) > new Date(max) ? item.created_at : max),

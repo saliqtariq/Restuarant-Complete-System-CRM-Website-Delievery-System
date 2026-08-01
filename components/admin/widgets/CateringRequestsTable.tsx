@@ -199,7 +199,7 @@ export function CateringRequestsTable({
           </div>
 
           {/* Time ago */}
-          <div className="text-xs text-gray-500 font-medium">{timeAgo(req.created_at, now)}</div>
+          <div className="text-xs text-gray-500 font-medium" suppressHydrationWarning>{timeAgo(req.created_at, now)}</div>
 
           {/* Status Dropdown */}
           <div className="flex justify-end">

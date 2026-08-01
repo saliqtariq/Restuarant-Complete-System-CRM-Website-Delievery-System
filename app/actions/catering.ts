@@ -1,9 +1,12 @@
 "use server";
 
 import { supabaseAdmin } from "@/backend/supabaseServer";
-import { supabase } from "@/backend/supabase";
 import { requireAdmin } from "@/lib/auth/admin";
+import { getClientIp, rateLimit } from "@/lib/security/rateLimit";
+import { isValidEmail, normalizeEmail, normalizeText } from "@/lib/security/validation";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
+import { z } from "zod";
 import { OrderRow } from "./dashboard";
 
 // ─── Types ───────────────────────────────────────────────
@@ -24,6 +27,16 @@ export type CateringRequestRow = {
 
 export type CateringRequestStatus = "new" | "contacted" | "confirmed" | "cancelled";
 
+const cateringRequestSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  phone: z.string().trim().regex(/^03[0-9]{9}$/, "Invalid phone number"),
+  email: z.string().trim().max(254).optional(),
+  eventType: z.string().trim().min(1).max(100),
+  guestCount: z.string().trim().min(1).max(50),
+  eventDate: z.string().trim().max(20),
+  notes: z.string().trim().max(1000).optional(),
+});
+
 // ─── Public: Submit a catering request (from website) ────
 
 export async function submitCateringRequest(formData: {
@@ -35,20 +48,38 @@ export async function submitCateringRequest(formData: {
   eventDate: string;
   notes: string;
 }): Promise<{ success: boolean; error?: string }> {
-  const { error } = await supabase.from("catering_requests").insert({
-    name: formData.name,
-    phone: formData.phone,
-    email: formData.email || null,
-    event_type: formData.eventType,
-    guest_count: formData.guestCount,
-    event_date: formData.eventDate || null,
-    notes: formData.notes || null,
+  const headerStore = await headers();
+  const ip = getClientIp(headerStore);
+  const limited = await rateLimit(`catering:${ip}`, 5, 60 * 60 * 1000);
+  if (limited.limited) {
+    return { success: false, error: "Too many submissions. Please try again later." };
+  }
+
+  const parsed = cateringRequestSchema.safeParse(formData);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message || "Invalid request" };
+  }
+
+  const data = parsed.data;
+  const email = data.email?.trim() || null;
+  if (email && !isValidEmail(email)) {
+    return { success: false, error: "Invalid email address." };
+  }
+
+  const { error } = await supabaseAdmin.from("catering_requests").insert({
+    name: normalizeText(data.name, 80),
+    phone: data.phone,
+    email: email ? normalizeEmail(email) : null,
+    event_type: normalizeText(data.eventType, 100),
+    guest_count: normalizeText(data.guestCount, 50),
+    event_date: data.eventDate || null,
+    notes: data.notes ? normalizeText(data.notes, 1000) : null,
     status: "new",
   });
 
   if (error) {
     console.error("submitCateringRequest error:", error);
-    return { success: false, error: error.message };
+    return { success: false, error: "Failed to submit request. Please try again." };
   }
   return { success: true };
 }
@@ -95,7 +126,6 @@ export async function updateCateringRequestStatus(
 export async function getCateringOrders(): Promise<OrderRow[]> {
   await requireAdmin();
 
-  // Fetch orders whose item names contain catering-related keywords
   const { data, error } = await supabaseAdmin
     .from("orders")
     .select("*")
@@ -108,7 +138,6 @@ export async function getCateringOrders(): Promise<OrderRow[]> {
     console.error("getCateringOrders query1 error:", error);
   }
 
-  // Also fetch orders whose order_items contain catering keywords
   const { data: cateringItemOrders, error: error2 } = await supabaseAdmin
     .from("order_items")
     .select("order_id")
@@ -122,14 +151,12 @@ export async function getCateringOrders(): Promise<OrderRow[]> {
 
   const orderIdsFromItems = (cateringItemOrders ?? []).map((r) => r.order_id);
 
-  // Combine and deduplicate
   const allOrderIds = new Set<string>();
   (data ?? []).forEach((o) => allOrderIds.add(o.id));
   orderIdsFromItems.forEach((id) => allOrderIds.add(id));
 
   if (allOrderIds.size === 0) return [];
 
-  // Fetch full order rows for combined IDs
   const { data: finalOrders, error: error3 } = await supabaseAdmin
     .from("orders")
     .select("*")

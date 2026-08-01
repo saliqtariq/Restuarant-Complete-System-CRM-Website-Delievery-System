@@ -13,6 +13,8 @@ import {
   Store,
   CreditCard,
 } from "lucide-react";
+import { supabase } from "@/backend/supabase";
+import type { Session } from "@supabase/supabase-js";
 
 type PaymentMethod = "cod";
 
@@ -35,6 +37,7 @@ export default function CheckoutPage() {
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
+  const [session, setSession] = useState<Session | null>(null);
 
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<{
@@ -46,12 +49,24 @@ export default function CheckoutPage() {
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [couponError, setCouponError] = useState("");
 
-  // Pre-fill address if delivery location is set
+  // Pre-fill address if delivery location is set, and fetch user session
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user?.user_metadata) {
+        const meta = session.user.user_metadata;
+        if (meta.first_name || meta.last_name) setFullName(`${meta.first_name || ""} ${meta.last_name || ""}`.trim());
+        if (meta.phone) setPhone(meta.phone);
+        if (meta.city && orderType === "delivery") setCity(meta.city);
+        if (meta.address && orderType === "delivery") setAddress(meta.address);
+      }
+    });
+    
     const id = window.setTimeout(() => {
       if (orderType !== "delivery" || !locationDetails) return;
-      setAddress(locationDetails);
-      setCity("Lahore");
+      // Only set from locationDetails if not already pre-filled from user profile
+      setAddress((prev) => prev || locationDetails);
+      setCity((prev) => prev || "Lahore");
     }, 0);
     return () => window.clearTimeout(id);
   }, [orderType, locationDetails]);
@@ -87,9 +102,27 @@ export default function CheckoutPage() {
   const handleCodSubmit = async () => {
     setIsSubmitting(true);
     try {
+      // Auto-save user profile fields if authenticated
+      if (session) {
+        const [firstName, ...lastNameArr] = fullName.split(" ");
+        const lastName = lastNameArr.join(" ");
+        supabase.auth.updateUser({
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone,
+            city: orderType === "delivery" ? city : undefined,
+            address: orderType === "delivery" ? address : undefined,
+          }
+        }).catch(console.error); // Fire and forget
+      }
+
       const response = await fetch("/api/checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...(session?.access_token ? { "Authorization": `Bearer ${session.access_token}` } : {})
+        },
         body: JSON.stringify({
           items,
           delivery: {

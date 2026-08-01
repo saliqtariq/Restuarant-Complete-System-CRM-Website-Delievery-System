@@ -1,8 +1,21 @@
 "use server";
 
 import { supabaseAdmin } from "@/backend/supabaseServer";
-import { ADMIN_SESSION_COOKIE, verifyAdminSessionToken } from "@/lib/auth/admin";
-import { cookies } from "next/headers";
+import {
+  ADMIN_SESSION_COOKIE,
+  verifyAdminSessionToken,
+} from "@/lib/auth/admin";
+import {
+  createKdsSessionToken,
+  getKdsSessionCookieOptions,
+  isKdsSessionValid,
+  isValidKdsStatus,
+  KDS_SESSION_COOKIE,
+  verifyKdsPassword,
+} from "@/lib/auth/kds";
+import { fetchCookingOrders } from "@/lib/kds/orders";
+import { getClientIp, rateLimit } from "@/lib/security/rateLimit";
+import { cookies, headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { OrderRow } from "./dashboard";
@@ -16,17 +29,12 @@ export async function getKdsOrders(): Promise<KdsOrder[]> {
   const hasKdsAccess = await isKdsAuthenticated();
   if (!hasKdsAccess) return [];
 
-  const { data, error } = await supabaseAdmin
-    .from("orders")
-    .select(`*, order_items(*)`)
-    .eq("status", "cooking")   // Only confirmed orders — pending stays in dashboard queue
-    .order("created_at", { ascending: true }); // Oldest first
-
-  if (error) {
+  try {
+    return (await fetchCookingOrders()) as KdsOrder[];
+  } catch (error) {
     console.error("getKdsOrders error:", error);
     return [];
   }
-  return data as KdsOrder[];
 }
 
 export async function updateKdsOrderStatus(
@@ -35,6 +43,10 @@ export async function updateKdsOrderStatus(
 ): Promise<{ success: boolean; error?: string }> {
   const hasKdsAccess = await isKdsAuthenticated();
   if (!hasKdsAccess) return { success: false, error: "Unauthorized" };
+
+  if (!isValidKdsStatus(newStatus)) {
+    return { success: false, error: "Invalid order status" };
+  }
 
   const { error } = await supabaseAdmin
     .from("orders")
@@ -46,37 +58,46 @@ export async function updateKdsOrderStatus(
     return { success: false, error: error.message };
   }
 
-  // Revalidate both views so dashboard stays in sync with KDS
   revalidatePath("/kds");
   revalidatePath("/dashboard");
-  
+
   return { success: true };
 }
 
 export async function logoutKds() {
-  (await cookies()).delete("kds_session");
+  (await cookies()).delete(KDS_SESSION_COOKIE);
   redirect("/kds/login");
 }
 
 export async function loginKds(password: string): Promise<{ success: boolean; error?: string }> {
-  const correctPassword = process.env.KDS_PASSWORD;
-  if (!correctPassword) return { success: false, error: "KDS password not configured on server." };
+  const headerStore = await headers();
+  const ip = getClientIp(headerStore);
 
-  if (password === correctPassword) {
-    (await cookies()).set("kds_session", "true", { 
-      httpOnly: true, 
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 30 // 30 days
-    });
+  const ipLimit = await rateLimit(`kds-login:ip:${ip}`, 10, 60 * 60 * 1000);
+  if (ipLimit.limited) {
+    return {
+      success: false,
+      error: `Too many login attempts. Please try again in ${ipLimit.retryAfter} seconds.`,
+    };
+  }
+
+  if (!process.env.KDS_PASSWORD) {
+    return { success: false, error: "KDS password not configured on server." };
+  }
+
+  if (verifyKdsPassword(password)) {
+    const token = await createKdsSessionToken();
+    (await cookies()).set(KDS_SESSION_COOKIE, token, getKdsSessionCookieOptions());
     return { success: true };
   }
+
   return { success: false, error: "Invalid password" };
 }
 
 export async function isKdsAuthenticated(): Promise<boolean> {
+  if (await isKdsSessionValid()) return true;
+
   const cookieStore = await cookies();
-  const hasKdsSession = cookieStore.get("kds_session")?.value === "true";
-  if (hasKdsSession) return true;
   const adminToken = cookieStore.get(ADMIN_SESSION_COOKIE)?.value;
   if (!adminToken) return false;
   return verifyAdminSessionToken(adminToken);

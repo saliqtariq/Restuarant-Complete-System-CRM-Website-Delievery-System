@@ -65,6 +65,7 @@ export async function submitReview(
 }
 
 export async function getReviews(): Promise<ReviewRow[]> {
+  await requireAdmin();
   const { data, error } = await supabaseAdmin
     .from("reviews")
     .select("*")

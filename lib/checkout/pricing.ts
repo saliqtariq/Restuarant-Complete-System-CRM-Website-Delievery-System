@@ -1,4 +1,6 @@
 import { supabaseAdmin } from "@/backend/supabaseServer";
+import { calculateCouponDiscount, isCouponValid } from "@/lib/checkout/coupon";
+import { getCatalogItem } from "@/lib/menu/catalog";
 
 const DELIVERY_FEE = 150;
 const GST_RATE = 0.16;
@@ -43,7 +45,6 @@ async function resolveUnitPrice(name: string): Promise<{ price: number; image: s
 
   // If not found in database table, fallback to static CATALOG if present
   if (!menuItem) {
-    const { getCatalogItem } = await import("@/lib/menu/catalog");
     const catalogItem = getCatalogItem(name);
     if (catalogItem) {
       return {
@@ -110,17 +111,8 @@ export async function calculateOrderTotals(
       .single();
 
     if (coupon) {
-      const isValid =
-        (!coupon.expiry_date || new Date(coupon.expiry_date) >= new Date()) &&
-        subtotal >= coupon.min_order_amount;
-
-      if (isValid) {
-        if (coupon.discount_type === "percentage") {
-          discount = subtotal * (coupon.discount_amount / 100);
-        } else {
-          discount = coupon.discount_amount;
-        }
-        discount = Math.min(discount, subtotal);
+      if (isCouponValid(coupon, subtotal)) {
+        discount = calculateCouponDiscount(coupon, subtotal);
       }
     }
   }

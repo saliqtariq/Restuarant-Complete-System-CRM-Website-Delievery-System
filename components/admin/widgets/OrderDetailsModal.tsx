@@ -15,11 +15,13 @@ export function OrderDetailsModal({ isOpen, onClose, order }: Props) {
   const [loadingItems, setLoadingItems] = useState(false);
   const [updating, setUpdating] = useState(false);
 
+  const orderId = order?.id;
+
   useEffect(() => {
-    if (!isOpen || !order) return;
+    if (!isOpen || !orderId) return;
 
     let active = true;
-    void getOrderItems(order.id)
+    void getOrderItems(orderId)
         .then((data) => {
           if (!active) return;
           setItems(data);
@@ -33,7 +35,7 @@ export function OrderDetailsModal({ isOpen, onClose, order }: Props) {
       active = false;
       setLoadingItems(true);
     };
-  }, [isOpen, order]);
+  }, [isOpen, orderId]);
 
   if (!isOpen || !order) return null;
 

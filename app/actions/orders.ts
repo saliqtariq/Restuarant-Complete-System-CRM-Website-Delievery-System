@@ -19,17 +19,48 @@ export async function updateOrderStatus(
   newStatus: OrderStatus
 ): Promise<{ success: boolean; error?: string }> {
   await requireAdmin();
-  const { error } = await supabaseAdmin
+
+  if (newStatus === "out_for_delivery") {
+    // Check if a driver is assigned
+    const { data: order } = await supabaseAdmin
+      .from("orders")
+      .select("assigned_driver_id")
+      .eq("id", orderId)
+      .single();
+
+    if (!order?.assigned_driver_id) {
+      return { success: false, error: "Cannot mark out for delivery without assigning a driver first." };
+    }
+  }
+
+  const { data: updatedOrder, error } = await supabaseAdmin
     .from("orders")
     .update({ status: newStatus })
-    .eq("id", orderId);
+    .eq("id", orderId)
+    .select("assigned_driver_id")
+    .single();
 
   if (error) {
     console.error("updateOrderStatus error:", error);
     return { success: false, error: error.message };
   }
 
+  // If marked as delivered manually from the admin panel, free the driver
+  if (newStatus === "delivered" && updatedOrder?.assigned_driver_id) {
+    await supabaseAdmin
+      .from("drivers")
+      .update({ status: "Active" })
+      .eq("id", updatedOrder.assigned_driver_id);
+      
+    // Optionally update the delivery assignment status as well
+    await supabaseAdmin
+      .from("delivery_assignments")
+      .update({ status: "delivered" })
+      .eq("order_id", orderId);
+  }
+
   revalidatePath("/dashboard");
+  revalidatePath("/dashboard/delivery");
   return { success: true };
 }
 
@@ -90,7 +121,7 @@ export async function getOrders(type?: "all" | "pickup" | "delivery"): Promise<O
   await requireAdmin();
   let query = supabaseAdmin
     .from("orders")
-    .select("*")
+    .select("*, driver:drivers(name, phone)")
     .neq("status", "awaiting_payment")
     .order("created_at", { ascending: false });
 

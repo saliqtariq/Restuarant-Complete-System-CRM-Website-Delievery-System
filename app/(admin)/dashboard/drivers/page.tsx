@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Driver, getDriversByBranch } from "@/app/actions/drivers";
+import { AddDriverModal } from "@/components/admin/widgets/AddDriverModal";
 
 const branches = ["Main Branch", "Downtown Branch", "Uptown Branch"];
 
@@ -9,9 +10,11 @@ export default function DeliveryManagementPage() {
   const [selectedBranch, setSelectedBranch] = useState<string>("Main Branch");
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  useEffect(() => {
+  const fetchDrivers = useCallback(() => {
     let active = true;
+    setLoading(true);
 
     void getDriversByBranch(selectedBranch)
       .then((data) => {
@@ -25,15 +28,22 @@ export default function DeliveryManagementPage() {
 
     return () => {
       active = false;
-      setLoading(true);
     };
   }, [selectedBranch]);
+
+  useEffect(() => {
+    const cleanup = fetchDrivers();
+    return cleanup;
+  }, [fetchDrivers]);
 
   return (
     <div className="flex flex-col gap-6 pb-12">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Delivery Management</h1>
-        <button className="bg-[#E63946] hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm">
+        <button 
+          onClick={() => setIsAddModalOpen(true)}
+          className="bg-[#E63946] hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm"
+        >
           + Add New Driver
         </button>
       </div>
@@ -134,6 +144,12 @@ export default function DeliveryManagementPage() {
           </table>
         </div>
       </div>
+
+      <AddDriverModal 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+        onSuccess={() => fetchDrivers()} 
+      />
     </div>
   );
 }

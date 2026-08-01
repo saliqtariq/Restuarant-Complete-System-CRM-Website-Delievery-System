@@ -1,9 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCartStore } from "@/lib/cartStore";
-import { useToastStore } from "@/components/Toast";
-import { useState, useRef } from "react";
+import { useCartItemActions } from "@/hooks/useCartItemActions";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
 const popularItems = [
@@ -33,43 +31,14 @@ const popularItems = [
 ];
 
 export default function PopularItems() {
-  const { items, addItem, updateQuantity, removeItem } = useCartStore();
-  const addToast = useToastStore((s) => s.addToast);
-  const [addedItem, setAddedItem] = useState<string | null>(null);
-  const [blockedItems, setBlockedItems] = useState<Record<string, boolean>>({});
-  const clickCountsRef = useRef<Record<string, number>>({});
-
-  const handleIncrease = (item: (typeof popularItems)[number], cartItem?: { quantity: number }) => {
-    const currentCount = clickCountsRef.current[item.name] || 0;
-    if (currentCount >= 2) return; // Synchronous block
-
-    clickCountsRef.current[item.name] = currentCount + 1;
-
-    if (currentCount + 1 >= 2) {
-      // Disable for 1.5s after 2nd click
-      setBlockedItems((prev) => ({ ...prev, [item.name]: true }));
-      setTimeout(() => {
-        setBlockedItems((prev) => ({ ...prev, [item.name]: false }));
-        clickCountsRef.current[item.name] = 0; // reset
-      }, 1500);
-    } else {
-      // Reset if only 1 click happened
-      setTimeout(() => {
-        if (clickCountsRef.current[item.name] === 1) {
-          clickCountsRef.current[item.name] = 0;
-        }
-      }, 2000);
-    }
-
-    if (cartItem) {
-      updateQuantity(item.name, cartItem.quantity + 1);
-    } else {
-      addItem({ name: item.name, price: item.price, image: item.image });
-      addToast({ name: item.name, image: item.image, price: item.price });
-      setAddedItem(item.name);
-      setTimeout(() => setAddedItem(null), 1200);
-    }
-  };
+  const {
+    items,
+    updateQuantity,
+    removeItem,
+    addedItem,
+    blockedItems,
+    handleIncrease,
+  } = useCartItemActions();
 
   return (
     <section className="w-full bg-white pt-0 pb-4">

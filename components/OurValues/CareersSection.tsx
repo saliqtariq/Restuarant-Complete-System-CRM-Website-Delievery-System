@@ -1,59 +1,41 @@
-import { ArrowRight } from "lucide-react";
+"use client";
 
 export default function CareersSection() {
   return (
-    <div className="w-full bg-[#fcf8f2] py-16 md:py-24 px-6 md:px-12 lg:px-24">
-      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-12 lg:gap-16 items-center">
+    <div className="w-full bg-[#fcf8f2] py-10 md:py-14 px-6 md:px-12 lg:px-24">
+      <div className="max-w-4xl mx-auto flex flex-col items-center justify-center text-center">
         
-        {/* Left Side: Typography */}
-        <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left lg:pl-28">
-          <h3 className="text-[#3b1c0a] text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-wide transform -rotate-3 mb-1" style={{ fontFamily: "var(--font-bebas)" }}>
-            We Don&apos;t Just
-          </h3>
-          
-          <div className="flex items-center gap-2 md:gap-3 mt-1 transform -rotate-3">
-            <div className="hidden sm:flex flex-col gap-1.5 opacity-80">
-              <div className="w-5 h-1 bg-[#b51e18] rounded-full rotate-12"></div>
-              <div className="w-6 h-1 bg-[#b51e18] rounded-full -rotate-12"></div>
-            </div>
-            <h3 className="text-[#3b1c0a] text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-wide" style={{ fontFamily: "var(--font-bebas)" }}>
-              Serve <span className="text-[#b51e18]">Great Food</span>...
-            </h3>
-          </div>
-          
-          <div className="flex items-center justify-center gap-2 mt-4 transform -rotate-3">
-            <span className="text-[#3b1c0a] text-xl font-black">=</span>
-            <h3 className="text-[#3b1c0a] text-xl md:text-2xl lg:text-3xl font-black uppercase tracking-widest" style={{ fontFamily: "var(--font-bebas)" }}>
-              We Build
-            </h3>
-            <span className="text-[#3b1c0a] text-xl font-black">=</span>
-          </div>
-
-          <h2 className="text-[#3b1c0a] text-[3.5rem] md:text-[4rem] lg:text-[5rem] font-black uppercase leading-[0.85] tracking-tighter transform -rotate-3 mt-4 drop-shadow-sm" style={{ fontFamily: "var(--font-anton)" }}>
-            Great
-          </h2>
-          <div className="relative mt-1">
-            <h2 className="text-[#3b1c0a] text-[3rem] md:text-[3.5rem] lg:text-[4.5rem] font-black uppercase leading-[0.85] tracking-tighter transform -rotate-3 drop-shadow-sm" style={{ fontFamily: "var(--font-anton)" }}>
-              Careers.
-            </h2>
-            <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 lg:left-0 lg:translate-x-0 w-[70%] h-2 bg-[#b51e18] rounded-full transform -rotate-3 opacity-90"></div>
-          </div>
+        {/* Icon Header using SVG directly */}
+        <div className="w-20 h-20 rounded-full bg-[#b51e18]/10 text-[#b51e18] flex items-center justify-center mb-6 shadow-sm">
+          <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+          </svg>
         </div>
 
-        {/* Right Side: Content */}
-        <div className="flex-1 flex flex-col w-full max-w-xl mx-auto lg:mx-0 lg:pr-12">
-          <p className="text-[#4a2e1b] text-lg md:text-xl font-medium leading-relaxed mb-8">
-            We believe great restaurants are built by great people. That&apos;s why we invest in training, career development, and benefits that help our team succeed.
-          </p>
+        {/* Title */}
+        <h2 
+          className="text-[#3b1c0a] text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight mb-3" 
+          style={{ fontFamily: "var(--font-anton)" }}
+        >
+          No Open Vacancies
+        </h2>
 
-          <div className="flex flex-col items-center sm:items-start gap-4">
-            <button className="bg-[#b51e18] hover:bg-[#9c1914] transition-colors text-white text-xl md:text-2xl font-black uppercase tracking-widest py-4 px-10 rounded-md flex items-center gap-3 shadow-md w-full sm:w-auto justify-center" style={{ fontFamily: "var(--font-bebas)" }}>
-              Explore Careers <ArrowRight className="w-6 h-6" strokeWidth={3} />
-            </button>
-            <p className="text-[#4a2e1b] text-lg font-serif italic mt-3 text-center sm:text-left">
-              Be part of something <span className="font-bold pb-0.5 border-b-2 border-[#b51e18]">delicious.</span>
-            </p>
-          </div>
+        {/* Subtitle */}
+        <p className="text-[#b51e18] text-lg sm:text-xl font-bold uppercase tracking-widest mb-4" style={{ fontFamily: "var(--font-bebas)" }}>
+          Thank you for your interest in joining Abraham&apos;s Table
+        </p>
+
+        {/* Description */}
+        <p className="text-[#4a2e1b] text-base md:text-lg max-w-xl font-medium leading-relaxed mb-8">
+          We currently do not have any open positions available. Please check back later or follow our updates as new opportunities open up across our team and delivery fleet.
+        </p>
+
+        {/* Sub text note */}
+        <div className="bg-white/80 border border-[#3b1c0a]/10 rounded-xl px-6 py-4 max-w-lg shadow-sm">
+          <p className="text-xs sm:text-sm text-[#4a2e1b] font-medium">
+            Have questions or want to send an open resume? Feel free to reach out to our team at <span className="font-bold text-[#b51e18] underline">careers@abrahamstable.com</span>
+          </p>
         </div>
 
       </div>

@@ -20,6 +20,11 @@ export type OrderRow = {
   payment_method: string;
   status: string;
   created_at: string;
+  assigned_driver_id?: string | null;
+  driver?: {
+    name: string;
+    phone: string;
+  } | null;
 };
 
 export type ConfirmationOrderItem = {
@@ -165,7 +170,7 @@ export async function getLiveOrders(): Promise<OrderRow[]> {
   await requireAdmin();
   const { data, error } = await supabaseAdmin
     .from("orders")
-    .select("*")
+    .select("*, driver:drivers(name, phone)")
     .not("status", "eq", "delivered")
     .not("status", "eq", "cancelled")
     .order("created_at", { ascending: false })

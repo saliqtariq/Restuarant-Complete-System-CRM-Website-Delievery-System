@@ -1,14 +1,9 @@
 import { NextRequest } from "next/server";
-import { Resend } from "resend";
-import { supabaseAdmin } from "@/backend/supabaseServer";
-import { getVerificationEmailHtml } from "@/lib/emails/VerificationEmail";
-import { generateOtpCode } from "@/lib/security/otp";
+import { sendVerificationCode } from "@/lib/emails/sendVerificationCode";
 import { getClientIp, rateLimit } from "@/lib/security/rateLimit";
 import { isBodyParsingError, readJsonBody } from "@/lib/security/request";
-import { isValidEmail, normalizeEmail, normalizeText } from "@/lib/security/validation";
+import { isValidEmail, normalizeEmail } from "@/lib/security/validation";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const RESEND_COOLDOWN_MS = 60 * 1000;
 const GENERIC_RESPONSE = {
   success: true,
   message: "If a pending verification exists, a code will be sent shortly.",
@@ -44,70 +39,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: existing, error: lookupError } = await supabaseAdmin
-      .from("email_verifications")
-      .select("user_id, created_at")
-      .eq("email", normalizedEmail)
-      .maybeSingle();
-
-    if (lookupError || !existing) {
-      if (lookupError) console.error("Verification lookup error:", lookupError);
-      return Response.json(GENERIC_RESPONSE);
-    }
-
-    if (existing.created_at) {
-      const elapsed = Date.now() - new Date(existing.created_at).getTime();
-      if (elapsed < RESEND_COOLDOWN_MS) {
-        return Response.json(
-          { error: "Please wait before requesting another code" },
-          { status: 429 }
-        );
-      }
-    }
-
-    const { data: authUser, error: authError } =
-      await supabaseAdmin.auth.admin.getUserById(existing.user_id);
-
-    if (authError || !authUser.user) {
-      if (authError) console.error("Auth lookup error:", authError);
-      return Response.json(GENERIC_RESPONSE);
-    }
-
-    if (authUser.user.app_metadata?.email_verified) {
-      return Response.json(GENERIC_RESPONSE);
-    }
-
-    const firstName = normalizeText(
-      String(authUser.user.user_metadata?.first_name || "there"),
-      40
-    );
-    const code = generateOtpCode();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-
-    const { error: dbError } = await supabaseAdmin
-      .from("email_verifications")
-      .update({
-        code,
-        expires_at: expiresAt,
-        created_at: new Date().toISOString(),
-      })
-      .eq("email", normalizedEmail);
-
-    if (dbError) {
-      console.error("DB error updating verification code:", dbError);
-      return Response.json({ error: "Failed to generate new code" }, { status: 500 });
-    }
-
-    const { error: emailError } = await resend.emails.send({
-      from: "Abraham's Table <onboarding@resend.dev>",
-      to: normalizedEmail,
-      subject: "Verify Your Email - Abraham's Table",
-      html: getVerificationEmailHtml({ code, firstName }),
+    const result = await sendVerificationCode({
+      email: normalizedEmail,
+      mode: "resend",
     });
 
-    if (emailError) {
-      console.error("Resend email error:", emailError);
-      return Response.json({ error: "Failed to send verification email" }, { status: 500 });
+    if (!result.ok) {
+      return Response.json({ error: result.error }, { status: result.status });
     }
 
     return Response.json(GENERIC_RESPONSE);

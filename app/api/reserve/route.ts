@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/backend/supabaseServer";
+import { countOverlappingBookings, parseTimeToMinutes } from "@/lib/reservations/capacity";
+import { getClientIp, rateLimit } from "@/lib/security/rateLimit";
+import { isBodyParsingError, readJsonBody } from "@/lib/security/request";
 import { z } from "zod";
 
 const reservationSchema = z.object({
@@ -16,7 +19,16 @@ const reservationSchema = z.object({
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const ip = getClientIp(req.headers);
+    const limited = await rateLimit(`reserve:${ip}`, 10, 60 * 60 * 1000);
+    if (limited.limited) {
+      return NextResponse.json(
+        { error: "Too many reservation attempts. Please try again later." },
+        { status: 429, headers: { "Retry-After": String(limited.retryAfter) } }
+      );
+    }
+
+    const body = await readJsonBody<unknown>(req, 10_000);
     const parsed = reservationSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -35,8 +47,6 @@ export async function POST(req: Request) {
       table_number,
     } = parsed.data;
 
-    // ── Capacity check ───────────────────────────────────────────────────────
-    // Fetch config
     const { data: config } = await supabaseAdmin
       .from("restaurant_capacity_config")
       .select("max_tables_per_slot, slot_duration_minutes")
@@ -46,26 +56,19 @@ export async function POST(req: Request) {
     const maxTablesPerSlot = config?.max_tables_per_slot ?? 2;
     const slotDuration = config?.slot_duration_minutes ?? 90;
 
-    // Count how many RESERVATIONS already overlap with the requested time window.
-    // A reservation at H:MM overlaps if its time falls within ±slotDuration minutes.
-    const [rHour, rMin] = reservation_time.split(":").map(Number);
-    const rStartMinutes = rHour * 60 + rMin;
-    const windowStart = rStartMinutes - slotDuration; // exclusive lower bound (minutes)
-    const windowEnd   = rStartMinutes + slotDuration; // exclusive upper bound (minutes)
+    const slotMinutes = parseTimeToMinutes(reservation_time);
 
-    // Fetch all active reservations on the same date
     const { data: existing } = await supabaseAdmin
       .from("reservations")
       .select("reservation_time")
       .eq("reservation_date", reservation_date)
       .in("status", ["pending", "confirmed"]);
 
-    // Count bookings whose time falls inside the overlap window
-    const overlappingBookings = (existing ?? []).filter((r) => {
-      const [h, m] = r.reservation_time.split(":").map(Number);
-      const mins = h * 60 + m;
-      return mins > windowStart && mins < windowEnd;
-    }).length;
+    const overlappingBookings = countOverlappingBookings(
+      existing ?? [],
+      slotMinutes,
+      slotDuration
+    );
 
     if (overlappingBookings >= maxTablesPerSlot) {
       return NextResponse.json(
@@ -77,9 +80,7 @@ export async function POST(req: Request) {
         { status: 409 }
       );
     }
-    // ── End capacity check ───────────────────────────────────────────────────
 
-    // Insert into Supabase
     const { data: reservation, error } = await supabaseAdmin
       .from("reservations")
       .insert([
@@ -93,23 +94,31 @@ export async function POST(req: Request) {
           status: "pending",
         },
       ])
-      .select()
+      .select("id, reservation_date, reservation_time, status")
       .single();
 
     if (error) {
       console.error("Supabase insert error:", error);
-      return NextResponse.json(
-        { error: "Failed to create reservation" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Failed to create reservation" }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, reservation });
+    return NextResponse.json({
+      success: true,
+      reservation: {
+        id: reservation.id,
+        reservation_date: reservation.reservation_date,
+        reservation_time: reservation.reservation_time,
+        status: reservation.status,
+      },
+    });
   } catch (error) {
+    if (isBodyParsingError(error)) {
+      const message = error instanceof Error ? error.message : "Invalid request body";
+      const status = message.includes("large") ? 413 : 400;
+      return NextResponse.json({ error: message }, { status });
+    }
+
     console.error("Reservation API error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

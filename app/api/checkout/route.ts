@@ -62,10 +62,20 @@ export async function POST(req: Request) {
 
     const orderNumber = `ORD-${randomInt(100000, 1000000)}`;
 
+    const authHeader = req.headers.get("authorization");
+    let userId = null;
+    
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+      const { data: { user } } = await supabaseAdmin.auth.getUser(token);
+      if (user) userId = user.id;
+    }
+
     const { data: order, error: orderError } = await supabaseAdmin
       .from("orders")
       .insert([
         {
+          user_id: userId,
           order_number: orderNumber,
           order_type: orderType,
           customer_name: normalizeText(delivery.fullName, 80),
@@ -118,7 +128,7 @@ export async function POST(req: Request) {
     const status = message.includes("Invalid") || message.includes("empty") ? 400 : 500;
     console.error("Checkout API Error:", error);
     return NextResponse.json(
-      { error: status === 400 ? message : "Internal Server Error" },
+      { error: message },
       { status }
     );
   }
