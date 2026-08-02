@@ -1,6 +1,8 @@
 import { isKdsAuthenticated } from "@/app/actions/kds";
 import { redirect } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function KdsLayout({
   children,
 }: {
