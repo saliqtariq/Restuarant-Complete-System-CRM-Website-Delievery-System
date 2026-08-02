@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Driver, getDriversByBranch } from "@/app/actions/drivers";
 import { AddDriverModal } from "@/components/admin/widgets/AddDriverModal";
+import { DriverDetailsModal } from "@/components/admin/widgets/DriverDetailsModal";
 
 const branches = ["Main Branch", "Downtown Branch", "Uptown Branch"];
 
@@ -11,6 +12,7 @@ export default function DeliveryManagementPage() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
 
   const fetchDrivers = useCallback(() => {
     let active = true;
@@ -118,7 +120,7 @@ export default function DeliveryManagementPage() {
                     <td className="px-5 py-3.5 font-medium text-gray-700">
                       {driver.cnic}
                     </td>
-                    <td className="px-5 py-3.5 text-gray-600 max-w-[200px] truncate" title={driver.home_address}>
+                    <td className="px-5 py-3.5 text-gray-600 max-w-50 truncate" title={driver.home_address}>
                       {driver.home_address}
                     </td>
                     <td className="px-5 py-3.5">
@@ -133,7 +135,10 @@ export default function DeliveryManagementPage() {
                       </span>
                     </td>
                     <td className="px-5 py-3.5 text-center">
-                      <button className="text-[#E63946] hover:bg-red-50 border border-transparent hover:border-red-100 font-bold px-3 py-1.5 rounded text-[10px] transition-colors">
+                      <button 
+                        onClick={() => setSelectedDriver(driver)}
+                        className="text-[#E63946] hover:bg-red-50 border border-transparent hover:border-red-100 font-bold px-3 py-1.5 rounded text-[10px] transition-colors"
+                      >
                         View Details
                       </button>
                     </td>
@@ -149,6 +154,12 @@ export default function DeliveryManagementPage() {
         isOpen={isAddModalOpen} 
         onClose={() => setIsAddModalOpen(false)} 
         onSuccess={() => fetchDrivers()} 
+      />
+
+      <DriverDetailsModal
+        isOpen={!!selectedDriver}
+        onClose={() => setSelectedDriver(null)}
+        driver={selectedDriver}
       />
     </div>
   );

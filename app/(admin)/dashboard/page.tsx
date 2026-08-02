@@ -80,7 +80,7 @@ export default function DashboardPage() {
             <LiveOrdersTableWrapper />
           </Suspense>
         </div>
-        <div className="w-full lg:w-80 flex-shrink-0">
+        <div className="w-full lg:w-80 shrink-0">
           <Suspense fallback={<SkeletonLoader height="h-96" />}>
             <RightSidebarWidgetsWrapper />
           </Suspense>

@@ -19,7 +19,7 @@ export function OrderStatusWidget({ counts }: { counts: OrderStatusCounts }) {
         {statuses.map((s, i) => (
           <div key={i} className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${s.bg} flex-shrink-0`}>
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${s.bg} shrink-0`}>
                 <s.icon className={`w-4 h-4 ${s.color}`} />
               </div>
               <div>
@@ -51,7 +51,7 @@ export function PickupQueueWidget({ queue }: { queue: PickupQueueItem[] }) {
               <div className="flex items-center justify-between mb-1.5">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-gray-900 text-[12px]">{q.order_number}</span>
-                  <span className="font-semibold text-gray-700 text-[12px] max-w-[80px] truncate">{q.customer_name}</span>
+                  <span className="font-semibold text-gray-700 text-[12px] max-w-20 truncate">{q.customer_name}</span>
                   {q.payment_method !== "cod" && (
                     <span className="text-[9px] bg-green-100 text-green-700 font-bold px-1.5 py-0.5 rounded">PAID</span>
                   )}
@@ -93,7 +93,7 @@ export function DeliveryDriversWidget() {
         {drivers.map((d, i) => (
           <div key={i} className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-[11px] font-bold text-gray-600 flex-shrink-0">
+              <div className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-[11px] font-bold text-gray-600 shrink-0">
                 {d.name.split(" ").map((n) => n[0]).join("")}
               </div>
               <div>
@@ -114,7 +114,7 @@ export function DeliveryDriversWidget() {
 
 export function RightSidebarWidgets({ statusCounts, pickupQueue }: { statusCounts: OrderStatusCounts; pickupQueue: PickupQueueItem[] }) {
   return (
-    <div className="flex flex-col gap-4 w-full xl:w-[300px] shrink-0">
+    <div className="flex flex-col gap-4 w-full xl:w-75 shrink-0">
       <OrderStatusWidget counts={statusCounts} />
       <PickupQueueWidget queue={pickupQueue} />
       <DeliveryDriversWidget />

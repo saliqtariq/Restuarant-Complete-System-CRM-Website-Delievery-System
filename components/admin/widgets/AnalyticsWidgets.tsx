@@ -15,11 +15,11 @@ export function SalesOverviewChart({ data }: { data: SalesDay[] }) {
         </div>
       </div>
       {totalSales === 0 ? (
-        <div className="h-[200px] w-full flex items-center justify-center text-gray-400 font-medium text-sm">
+        <div className="h-50 w-full flex items-center justify-center text-gray-400 font-medium text-sm">
           No sales data for the last 7 days.
         </div>
       ) : (
-        <div className="h-[200px] w-full">
+        <div className="h-50 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
@@ -55,12 +55,12 @@ export function PaymentMethodsChart({ data }: { data: PaymentBreakdown[] }) {
         <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider">PAYMENT METHODS</h3>
       </div>
       {total === 0 ? (
-         <div className="h-[140px] w-full flex items-center justify-center text-gray-400 font-medium text-sm">
+         <div className="h-35 w-full flex items-center justify-center text-gray-400 font-medium text-sm">
            No payment data yet.
          </div>
       ) : (
         <div className="flex items-center justify-between">
-          <div className="w-[140px] h-[140px] relative">
+          <div className="w-35 h-35 relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -87,9 +87,9 @@ export function PaymentMethodsChart({ data }: { data: PaymentBreakdown[] }) {
             {formattedData.map((item, i) => (
               <div key={i} className="flex items-start justify-between">
                 <div className="flex items-start gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: item.color }}></div>
+                  <div className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: item.color }}></div>
                   <div>
-                    <div className="text-xs font-bold text-gray-900 max-w-[90px] truncate" title={item.name}>{item.name}</div>
+                    <div className="text-xs font-bold text-gray-900 max-w-22.5 truncate" title={item.name}>{item.name}</div>
                     <div className="text-[10px] text-gray-500">Rs {item.value.toLocaleString()}</div>
                   </div>
                 </div>
@@ -110,7 +110,7 @@ export function TopSellingItems({ items }: { items: TopItem[] }) {
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex-1 h-full">
       <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider mb-6">TOP SELLING ITEMS</h3>
       {items.length === 0 ? (
-        <div className="h-[140px] w-full flex items-center justify-center text-gray-400 font-medium text-sm">
+        <div className="h-35 w-full flex items-center justify-center text-gray-400 font-medium text-sm">
           No sales data yet.
         </div>
       ) : (
@@ -123,7 +123,7 @@ export function TopSellingItems({ items }: { items: TopItem[] }) {
                   🍔
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-gray-900 max-w-[120px] truncate" title={item.item_name}>{item.item_name}</div>
+                  <div className="text-sm font-bold text-gray-900 max-w-30 truncate" title={item.item_name}>{item.item_name}</div>
                   <div className="text-xs text-gray-500">{item.total_quantity} Orders</div>
                 </div>
               </div>

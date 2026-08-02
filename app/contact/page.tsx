@@ -72,7 +72,7 @@ export default function ContactPage() {
                   Touch
                 </h1>
                 
-                <div className="h-[1px] bg-[#422f27] w-full mb-8"></div>
+                <div className="h-px bg-[#422f27] w-full mb-8"></div>
                 
                 <div className="space-y-6">
                   {/* Email */}
@@ -88,7 +88,7 @@ export default function ContactPage() {
                     </div>
                   </div>
                   
-                  <div className="h-[1px] bg-[#422f27] w-full"></div>
+                  <div className="h-px bg-[#422f27] w-full"></div>
                   
                   {/* Phone */}
                   <div className="flex items-start gap-5">
@@ -103,7 +103,7 @@ export default function ContactPage() {
                     </div>
                   </div>
                   
-                  <div className="h-[1px] bg-[#422f27] w-full"></div>
+                  <div className="h-px bg-[#422f27] w-full"></div>
                   
                   {/* Business Hours */}
                   <div className="flex items-start gap-5">
@@ -120,9 +120,9 @@ export default function ContactPage() {
                 </div>
 
                 <div className="mt-10 flex items-center justify-center gap-4 opacity-50">
-                   <div className="h-[1px] bg-[#c4a47c] flex-1 max-w-[80px]"></div>
+                   <div className="h-px bg-[#c4a47c] flex-1 max-w-20"></div>
                    <DividerLeafIcon />
-                   <div className="h-[1px] bg-[#c4a47c] flex-1 max-w-[80px]"></div>
+                   <div className="h-px bg-[#c4a47c] flex-1 max-w-20"></div>
                 </div>
               </div>
             </div>

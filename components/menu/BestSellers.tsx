@@ -97,7 +97,7 @@ export default function BestSellers() {
                         {cartItem.quantity > 1 ? <Minus size={14} strokeWidth={3} /> : <Trash2 size={14} strokeWidth={2.5} className="text-[#a62116]" />}
                       </button>
                       <span
-                        className="text-[#4a1c0d] text-lg font-bold min-w-[1.5rem] text-center"
+                        className="text-[#4a1c0d] text-lg font-bold min-w-6 text-center"
                         style={{ fontFamily: "var(--font-bebas)" }}
                       >
                         {cartItem.quantity}
@@ -129,7 +129,7 @@ export default function BestSellers() {
                     ) : (
                       <>
                         ADD TO CART 
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 stroke-[3] stroke-current" fill="none" viewBox="0 0 24 24">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 stroke-3 stroke-current" fill="none" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                       </>

@@ -368,7 +368,7 @@ export function MenuManager({ initialCategories, initialItems }: Props) {
                             {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                           </button>
                           {normalizeImageUrl(cat.image_url) && (
-                            <div className="w-10 h-10 relative rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                            <div className="w-10 h-10 relative rounded-lg overflow-hidden bg-gray-100 shrink-0">
                               <Image
                                 src={normalizeImageUrl(cat.image_url)!}
                                 alt={cat.name}
@@ -442,7 +442,7 @@ export function MenuManager({ initialCategories, initialItems }: Props) {
                                 >
                                   <div className="flex items-center gap-3">
                                     {normalizeImageUrl(item.image_url) && (
-                                      <div className="w-9 h-9 relative rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                                      <div className="w-9 h-9 relative rounded-lg overflow-hidden bg-gray-100 shrink-0">
                                         <Image
                                           src={normalizeImageUrl(item.image_url)!}
                                           alt={item.name}
@@ -550,7 +550,7 @@ export function MenuManager({ initialCategories, initialItems }: Props) {
                         <td className="px-5 py-3">
                           <div className="flex items-center gap-3">
                             {normalizeImageUrl(item.image_url) && (
-                              <div className="w-9 h-9 relative rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                              <div className="w-9 h-9 relative rounded-lg overflow-hidden bg-gray-100 shrink-0">
                                 <Image src={normalizeImageUrl(item.image_url)!} alt={item.name} fill className="object-cover" />
                               </div>
                             )}

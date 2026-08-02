@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { getRequiredEnv } from "@/lib/env";
 import {
   createSignedToken,
   timingSafeEqual,
@@ -9,20 +10,12 @@ export const ADMIN_SESSION_COOKIE = "admin_session";
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24;
 
 function getSessionSecret(): string {
-  const secret = process.env.ADMIN_SESSION_SECRET;
-  if (!secret || secret.length < 32) {
-    throw new Error("ADMIN_SESSION_SECRET must be set and at least 32 characters");
-  }
-  return secret;
+  return getRequiredEnv("ADMIN_SESSION_SECRET", { minLength: 32 });
 }
 
 export function verifyAdminCredentials(username: string, password: string): boolean {
-  const expectedUsername = process.env.ADMIN_USERNAME;
-  const expectedPassword = process.env.ADMIN_PASSWORD;
-
-  if (!expectedUsername || !expectedPassword) {
-    throw new Error("ADMIN_USERNAME and ADMIN_PASSWORD must be set");
-  }
+  const expectedUsername = getRequiredEnv("ADMIN_USERNAME", { minLength: 1 });
+  const expectedPassword = getRequiredEnv("ADMIN_PASSWORD", { minLength: 8 });
 
   return (
     timingSafeEqual(username, expectedUsername) &&

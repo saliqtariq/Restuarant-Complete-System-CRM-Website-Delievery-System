@@ -11,7 +11,7 @@ export default function FundraisingPage() {
   return (
     <main className="min-h-screen bg-[#fdfbf7]">
       {/* Hero Banner */}
-      <div className="w-full bg-gradient-to-br from-[#451400] via-[#5a1e08] to-[#451400] text-white py-16 px-6 text-center">
+      <div className="w-full bg-linear-to-br from-[#451400] via-[#5a1e08] to-[#451400] text-white py-16 px-6 text-center">
         <div className="max-w-4xl mx-auto">
           <span className="inline-block bg-amber-400/20 text-amber-300 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3">
             Community Giving Back

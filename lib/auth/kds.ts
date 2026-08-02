@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { getRequiredEnv } from "@/lib/env";
 import {
   createSignedToken,
   timingSafeEqual,
@@ -12,16 +13,11 @@ export const KDS_ALLOWED_STATUSES = ["ready", "out_for_delivery", "delivered"] a
 export type KdsOrderStatus = (typeof KDS_ALLOWED_STATUSES)[number];
 
 function getKdsSessionSecret(): string {
-  const secret = process.env.KDS_SESSION_SECRET || process.env.ADMIN_SESSION_SECRET;
-  if (!secret || secret.length < 32) {
-    throw new Error("KDS_SESSION_SECRET or ADMIN_SESSION_SECRET must be set and at least 32 characters");
-  }
-  return secret;
+  return getRequiredEnv("KDS_SESSION_SECRET", { minLength: 32 });
 }
 
 export function verifyKdsPassword(password: string): boolean {
-  const expectedPassword = process.env.KDS_PASSWORD;
-  if (!expectedPassword) return false;
+  const expectedPassword = getRequiredEnv("KDS_PASSWORD", { minLength: 8 });
   return timingSafeEqual(password, expectedPassword);
 }
 
@@ -30,8 +26,7 @@ export async function createKdsSessionToken(): Promise<string> {
 }
 
 export async function verifyKdsSessionToken(token: string): Promise<boolean> {
-  const secret = process.env.KDS_SESSION_SECRET || process.env.ADMIN_SESSION_SECRET;
-  if (!secret || secret.length < 32) return false;
+  const secret = getRequiredEnv("KDS_SESSION_SECRET", { minLength: 32 });
   return verifySignedToken(token, secret, "kds");
 }
 

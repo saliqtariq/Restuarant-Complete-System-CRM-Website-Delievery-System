@@ -85,13 +85,13 @@ export default function MenuCategoryList() {
 
   return (
     <div className="flex flex-col w-full">
-      <div className="sticky top-[16px] z-40 bg-white/80 backdrop-blur-md shadow-sm border border-gray-100 rounded-full px-2 py-2 mb-6 md:mt-0 transition-all">
+      <div className="sticky top-4 z-40 bg-white/80 backdrop-blur-md shadow-sm border border-gray-100 rounded-full px-2 py-2 mb-6 md:mt-0 transition-all">
         <div className="flex overflow-x-auto no-scrollbar gap-2 items-center">
           {menuData.map((cat) => (
             <button
               key={cat.id}
               onClick={() => handleScrollTo(cat.id)}
-              className={`flex-shrink-0 px-6 py-2 rounded-full font-bold text-sm transition-all duration-300 uppercase tracking-widest ${activeCategory === cat.id
+              className={`shrink-0 px-6 py-2 rounded-full font-bold text-sm transition-all duration-300 uppercase tracking-widest ${activeCategory === cat.id
                   ? "bg-[#e5002a] text-white shadow-md scale-105"
                   : "bg-transparent text-gray-500 hover:text-black hover:bg-gray-100"
                 }`}
@@ -108,7 +108,7 @@ export default function MenuCategoryList() {
         {/* Left Side: Items */}
         <div className="flex-1 w-full flex flex-col gap-16 px-2 md:px-0 pb-20">
           {menuData.map((category) => (
-            <div key={category.id} id={category.id} className="scroll-mt-[150px]">
+            <div key={category.id} id={category.id} className="scroll-mt-37.5">
               <h2
                 className="text-[#2b2b36] text-4xl uppercase tracking-wider mb-6 border-b-2 border-[#e5002a] pb-2 inline-block"
                 style={{ fontFamily: "var(--font-bebas)" }}
@@ -161,7 +161,7 @@ export default function MenuCategoryList() {
                                 >
                                   {cartItem.quantity > 1 ? <Minus size={12} strokeWidth={3} /> : <Trash2 size={12} strokeWidth={2.5} />}
                                 </button>
-                                <span className="text-white text-sm font-bold min-w-[1.2rem] text-center">
+                                <span className="text-white text-sm font-bold min-w-4.8 text-center">
                                   {cartItem.quantity}
                                 </span>
                                 <button
@@ -196,7 +196,7 @@ export default function MenuCategoryList() {
         </div>
 
         {/* Right Side: Sticky Cart Sidebar */}
-        <div className="w-full md:w-[320px] xl:w-[380px] shrink-0 relative z-30">
+        <div className="w-full md:w-80 xl:w-95 shrink-0 relative z-30">
           <CartSidebar />
         </div>
       </div>

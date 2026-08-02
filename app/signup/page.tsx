@@ -94,7 +94,7 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center pt-6 pb-12 px-4">
-      <div className="w-full max-w-[400px] flex flex-col items-center">
+      <div className="w-full max-w-100 flex flex-col items-center">
 
         {/* Logo */}
         <div className="relative w-20 h-20 mb-2">
@@ -270,7 +270,7 @@ export default function SignUpPage() {
           {/* Terms & Conditions Checkbox */}
           <div className="space-y-2 mb-4">
             <label className="flex items-start gap-2.5 cursor-pointer select-none">
-              <div className="relative flex items-center justify-center mt-0.5 flex-shrink-0">
+              <div className="relative flex items-center justify-center mt-0.5 shrink-0">
                 <input
                   type="checkbox"
                   className="peer sr-only"
@@ -295,7 +295,7 @@ export default function SignUpPage() {
 
             {/* Email Marketing Checkbox */}
             <label className="flex items-start gap-2.5 cursor-pointer select-none">
-              <div className="relative flex items-center justify-center mt-0.5 flex-shrink-0">
+              <div className="relative flex items-center justify-center mt-0.5 shrink-0">
                 <input
                   type="checkbox"
                   className="peer sr-only"

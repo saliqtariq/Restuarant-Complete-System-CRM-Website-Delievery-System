@@ -1,15 +1,21 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/backend/supabaseServer";
+import { requireAdmin } from "@/lib/auth/admin";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   try {
+    await requireAdmin();
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q")?.trim() || "";
 
     if (!query) {
       return NextResponse.json({ results: [] });
+    }
+
+    if (query.length > 80) {
+      return NextResponse.json({ error: "Search query too long" }, { status: 400 });
     }
 
     const cleanQuery = query.toLowerCase();

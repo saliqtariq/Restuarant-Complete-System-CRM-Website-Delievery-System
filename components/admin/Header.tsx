@@ -157,7 +157,7 @@ export function Header() {
                       className="flex items-center justify-between px-4 py-3 hover:bg-red-50/50 transition-colors cursor-pointer border-b border-gray-50 last:border-0 group"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-red-100 text-gray-600 group-hover:text-red-600 flex items-center justify-center flex-shrink-0 transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-red-100 text-gray-600 group-hover:text-red-600 flex items-center justify-center shrink-0 transition-colors">
                           {res.type === "order" && <ShoppingBag className="w-4 h-4" />}
                           {res.type === "menu" && <Utensils className="w-4 h-4" />}
                           {res.type === "catering" && <Calendar className="w-4 h-4" />}
@@ -172,7 +172,7 @@ export function Header() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                      <div className="flex items-center gap-2 shrink-0 ml-3">
                         {res.badge && (
                           <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 group-hover:bg-red-100 group-hover:text-red-700">
                             {res.badge}
@@ -202,7 +202,7 @@ export function Header() {
             <Bell className="w-5 h-5" />
             {unreadCount > 0 && (
               <span
-                className="absolute top-1 right-1 min-w-[16px] h-4 bg-red-500 border border-white rounded-full flex items-center justify-center text-white font-bold"
+                className="absolute top-1 right-1 min-w-4 h-4 bg-red-500 border border-white rounded-full flex items-center justify-center text-white font-bold"
                 style={{ fontSize: "9px", padding: "0 3px" }}
               >
                 {unreadCount > 99 ? "99+" : unreadCount}
@@ -255,7 +255,7 @@ export function Header() {
                     >
                       {/* Icon */}
                       <div
-                        className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
+                        className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
                         style={{ background: "rgba(230,57,70,0.1)" }}
                       >
                         {n.order_type === "pickup" ? (
@@ -272,7 +272,7 @@ export function Header() {
                             {n.customer_name}
                           </span>
                           {!n.read && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
                           )}
                         </div>
                         <div className="text-xs text-gray-500 mt-0.5">
@@ -295,7 +295,7 @@ export function Header() {
 
         {/* User Profile */}
         <div className="flex items-center gap-2.5 cursor-pointer hover:bg-gray-50 rounded-xl px-2 py-1.5 transition-colors">
-          <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+          <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-white text-sm font-bold shrink-0">
             SA
           </div>
           <div className="hidden md:block">

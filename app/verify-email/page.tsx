@@ -145,7 +145,7 @@ function VerifyEmailContent() {
   if (verified) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center pt-6 pb-12 px-4">
-        <div className="w-full max-w-[400px] flex flex-col items-center">
+        <div className="w-full max-w-100 flex flex-col items-center">
           <div className="relative w-20 h-20 mb-2">
             <Image src="/Mainlogowithnotext.png" alt="Abraham's Table Logo" fill className="object-contain" priority />
           </div>
@@ -181,7 +181,7 @@ function VerifyEmailContent() {
   /* ── OTP input state ── */
   return (
     <div className="min-h-screen bg-white flex flex-col items-center pt-6 pb-12 px-4">
-      <div className="w-full max-w-[400px] flex flex-col items-center">
+      <div className="w-full max-w-100 flex flex-col items-center">
         {/* Logo */}
         <div className="relative w-20 h-20 mb-2">
           <Image src="/Mainlogowithnotext.png" alt="Abraham's Table Logo" fill className="object-contain" priority />
@@ -200,7 +200,7 @@ function VerifyEmailContent() {
           VERIFY YOUR EMAIL
         </h1>
 
-        <p className="text-gray-500 text-sm text-center mt-2 font-medium max-w-[320px]">
+        <p className="text-gray-500 text-sm text-center mt-2 font-medium max-w-80">
           We&apos;ve sent a 6-digit code to{" "}
           <span className="text-[#4a1c0d] font-semibold">{maskedEmail}</span>
         </p>

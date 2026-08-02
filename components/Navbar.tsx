@@ -63,7 +63,7 @@ export default function Navbar() {
         {/* Left Group: Logo and Main Menu */}
         <div className="flex items-center space-x-6 lg:space-x-10">
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center">
+          <div className="shrink-0 flex items-center">
             <Link href="/" onClick={closeMobile}>
               <Image
                 src="/Mainlogo.png"
@@ -77,40 +77,40 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center space-x-4 lg:space-x-6 text-[#4a1c10] font-[family-name:var(--font-anton)] text-xl tracking-widest pt-3 whitespace-nowrap">
+          <div className="hidden md:flex items-center space-x-4 lg:space-x-6 text-[#4a1c10] font-(family-name:--font-anton) text-xl tracking-widest pt-3 whitespace-nowrap">
             <Link
               href="/#explore-menu"
               className="group relative pb-2 transition-colors hover:text-[#9b1b1b] cursor-pointer"
             >
               MENU
-              <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+              <span className="absolute bottom-0 left-0 w-full h-0.75 bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </Link>
             <Link href="/catering" className="group relative pb-2 transition-colors hover:text-[#9b1b1b]">
               CATERING
-              <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+              <span className="absolute bottom-0 left-0 w-full h-0.75 bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </Link>
             <Link href="/values" className="group relative pb-2 transition-colors hover:text-[#9b1b1b]">
               OUR VALUES
-              <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+              <span className="absolute bottom-0 left-0 w-full h-0.75 bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </Link>
             <Link href="/download" className="group relative pb-2 transition-colors hover:text-[#9b1b1b]">
               DOWNLOAD APP
-              <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+              <span className="absolute bottom-0 left-0 w-full h-0.75 bg-[#9b1b1b] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </Link>
           </div>
         </div>
 
         {/* Right section: Actions */}
-        <div className="flex items-center space-x-4 lg:space-x-6 text-[#4a1c10] tracking-widest font-['Avenir_Next',_sans-serif] font-semibold text-sm whitespace-nowrap">
+        <div className="flex items-center space-x-4 lg:space-x-6 text-[#4a1c10] tracking-widest font-['Avenir_Next',sans-serif] font-semibold text-sm whitespace-nowrap">
           {/* Find a location */}
-          <button onClick={() => setLocationModalOpen(true)} className="hidden lg:flex items-center hover:opacity-80 transition-opacity max-w-[250px] xl:max-w-[300px] text-left">
+          <button onClick={() => setLocationModalOpen(true)} className="hidden lg:flex items-center hover:opacity-80 transition-opacity max-w-62.5 xl:max-w-75 text-left">
             <Image src="/LocationPin Pic.png" alt="Location" width={36} height={36} className="object-contain shrink-0" />
             {locationDetails ? (
               <div className="flex flex-col items-start justify-center ml-1 mt-1">
                 <span className="text-base font-bold leading-tight tracking-normal text-[#4a1c10] capitalize">
                   {orderType === 'delivery' ? 'Delivery To' : 'Pickup From'}
                 </span>
-                <span className="text-sm font-normal truncate max-w-[160px] xl:max-w-[200px] leading-tight text-[#4a1c10] tracking-normal">
+                <span className="text-sm font-normal truncate max-w-40 xl:max-w-50 leading-tight text-[#4a1c10] tracking-normal">
                   {locationDetails}
                 </span>
               </div>
@@ -197,7 +197,7 @@ export default function Navbar() {
         </div>
 
         {/* Drawer Nav Links */}
-        <nav className="flex flex-col px-6 pt-6 gap-1 font-[family-name:var(--font-anton)] text-xl tracking-widest text-[#4a1c10]">
+        <nav className="flex flex-col px-6 pt-6 gap-1 font-(family-name:--font-anton) text-xl tracking-widest text-[#4a1c10]">
           <Link
             href="/#explore-menu"
             onClick={closeMobile}
@@ -312,7 +312,7 @@ export default function Navbar() {
                   className="flex items-center gap-4 bg-gray-50 rounded-lg p-4 border border-gray-100 transition-all hover:shadow-sm"
                 >
                   {/* Item Image */}
-                  <div className="relative w-24 h-24 flex-shrink-0 rounded-md overflow-hidden bg-white shadow-sm border border-gray-100">
+                  <div className="relative w-24 h-24 shrink-0 rounded-md overflow-hidden bg-white shadow-sm border border-gray-100">
                     <Image
                       src={item.image}
                       alt={item.name}
@@ -347,7 +347,7 @@ export default function Navbar() {
                         <Minus size={14} strokeWidth={3} />
                       </button>
                       <span
-                        className="text-[#4a1c0d] text-lg font-bold min-w-[1.5rem] text-center"
+                        className="text-[#4a1c0d] text-lg font-bold min-w-6 text-center"
                         style={{ fontFamily: "var(--font-bebas)" }}
                       >
                         {item.quantity}
@@ -365,7 +365,7 @@ export default function Navbar() {
                   {/* Remove Button */}
                   <button
                     onClick={() => removeItem(item.name)}
-                    className="flex-shrink-0 text-gray-400 hover:text-[#a62116] transition-colors p-1"
+                    className="shrink-0 text-gray-400 hover:text-[#a62116] transition-colors p-1"
                     aria-label={`Remove ${item.name}`}
                   >
                     <Trash2 size={16} strokeWidth={2} />

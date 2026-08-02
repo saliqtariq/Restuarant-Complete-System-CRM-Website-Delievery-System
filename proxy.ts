@@ -5,7 +5,7 @@ import {
   verifyAdminSessionToken,
 } from "@/lib/auth/admin";
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const url = req.nextUrl;
 
   if (url.pathname.startsWith("/dashboard")) {
@@ -23,9 +23,17 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/admin/login", req.url));
   }
 
+  if (url.pathname.startsWith("/kds") && url.pathname !== "/kds/login") {
+    const token = req.cookies.get("kds_session")?.value;
+    const hasKdsSession = token ? await import("@/lib/auth/kds").then((m) => m.verifyKdsSessionToken(token)) : false;
+    if (!hasKdsSession) {
+      return NextResponse.redirect(new URL("/kds/login", req.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin"],
+  matcher: ["/dashboard/:path*", "/admin", "/kds/:path*"],
 };

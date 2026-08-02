@@ -202,7 +202,7 @@ export default function CheckoutPage() {
   return (
     <main className="min-h-screen bg-gray-50/50 pb-20">
       {/* Hero Banner */}
-      <div className="w-full bg-gradient-to-br from-[#451400] via-[#5a1e08] to-[#451400] py-12">
+      <div className="w-full bg-linear-to-br from-[#451400] via-[#5a1e08] to-[#451400] py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <Link
             href="/menu"
@@ -241,7 +241,7 @@ export default function CheckoutPage() {
                 ) : (
                   items.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-4 py-2">
-                      <div className="w-16 h-16 bg-gray-50 rounded-lg relative flex-shrink-0">
+                      <div className="w-16 h-16 bg-gray-50 rounded-lg relative shrink-0">
                         <Image
                           src={item.image}
                           alt={item.name}
@@ -442,7 +442,7 @@ export default function CheckoutPage() {
                         type="button"
                         onClick={handleApplyCoupon}
                         disabled={isApplyingCoupon || !couponCode.trim()}
-                        className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded uppercase font-bold tracking-widest text-sm disabled:opacity-50 transition-colors flex items-center justify-center min-w-[90px]"
+                        className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded uppercase font-bold tracking-widest text-sm disabled:opacity-50 transition-colors flex items-center justify-center min-w-22.5"
                       >
                         {isApplyingCoupon ? (
                           <Loader2 className="animate-spin" size={16} />

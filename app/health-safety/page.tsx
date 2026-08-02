@@ -9,7 +9,7 @@ export default function HealthSafetyPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Banner */}
-      <div className="w-full bg-gradient-to-br from-[#451400] via-[#5a1e08] to-[#451400] py-16 md:py-24">
+      <div className="w-full bg-linear-to-br from-[#451400] via-[#5a1e08] to-[#451400] py-16 md:py-24">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1
             className="text-5xl md:text-7xl text-white uppercase tracking-wider mb-4"

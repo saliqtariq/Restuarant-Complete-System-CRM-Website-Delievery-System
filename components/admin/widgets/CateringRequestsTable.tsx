@@ -71,7 +71,7 @@ function StatusDropdown({
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 min-w-[140px] py-1 overflow-hidden">
+          <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 min-w-35 py-1 overflow-hidden">
             {(Object.keys(STATUS_CONFIG) as CateringRequestStatus[]).map(
               (s) => (
                 <button

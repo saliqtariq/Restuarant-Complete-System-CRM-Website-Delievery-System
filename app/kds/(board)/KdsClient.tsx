@@ -80,7 +80,7 @@ function KdsTicket({
       <div className="flex items-center gap-4 px-5 py-2.5 border-b border-slate-700/60 bg-slate-800/80 text-sm text-slate-300">
         <div className="flex items-center gap-1.5">
           <User size={13} className="text-slate-500" />
-          <span className="font-semibold truncate max-w-[140px]">{order.customer_name}</span>
+          <span className="font-semibold truncate max-w-35">{order.customer_name}</span>
         </div>
         {order.phone && (
           <div className="flex items-center gap-1.5 text-slate-500">
@@ -334,7 +334,7 @@ export function KdsClient({ initialOrders }: { initialOrders: KdsOrder[] }) {
               {orders.map((order) => (
                 <div
                   key={order.id}
-                  className="shrink-0 w-[340px] h-full"
+                  className="shrink-0 w-85 h-full"
                   style={{ scrollSnapAlign: "start" }}
                 >
                   <KdsTicket

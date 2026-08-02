@@ -1,3 +1,5 @@
+import { getRequiredEnv } from "@/lib/env";
+
 export function timingSafeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let result = 0;
@@ -89,7 +91,7 @@ export async function verifySignedToken(
 }
 
 export async function hashOtp(code: string): Promise<string> {
-  const pepper = process.env.OTP_PEPPER || process.env.ADMIN_SESSION_SECRET || "";
+  const pepper = getRequiredEnv("OTP_PEPPER", { minLength: 16 });
   const data = new TextEncoder().encode(`${code}:${pepper}`);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   

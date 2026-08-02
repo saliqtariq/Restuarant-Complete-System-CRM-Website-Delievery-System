@@ -1,6 +1,6 @@
 export default function FreshStatement() {
   return (
-    <div className="w-full relative overflow-hidden min-h-[400px] flex items-center justify-center">
+    <div className="w-full relative overflow-hidden min-h-100 flex items-center justify-center">
       <video
         autoPlay
         loop

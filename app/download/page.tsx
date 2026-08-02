@@ -31,7 +31,7 @@ export default function DownloadAppPage() {
 
       {/* Right Side: Phone Image */}
       <div className="flex w-full items-start justify-center md:w-[55%] md:justify-end lg:w-[60%] lg:pr-4">
-        <div className="relative w-full max-w-[16rem] -translate-y-2 md:-translate-y-24 md:max-w-sm lg:max-w-md xl:max-w-lg">
+        <div className="relative w-full max-w-64 -translate-y-2 md:-translate-y-24 md:max-w-sm lg:max-w-md xl:max-w-lg">
           <Image
             src="/TransparentBgPlaceholder.png"
             alt="Abraham's Table App Coming Soon"

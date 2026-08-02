@@ -28,7 +28,7 @@ export function CateringView({ cateringOrders, cateringRequests }: CateringViewP
 
         {/* High-visibility Stat Cards */}
         <div className="flex items-center gap-3">
-          <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center gap-3 min-w-[150px]">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center gap-3 min-w-37.5">
             <div className="w-10 h-10 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold">
               <CalendarCheck size={20} />
             </div>
@@ -45,7 +45,7 @@ export function CateringView({ cateringOrders, cateringRequests }: CateringViewP
             </div>
           </div>
 
-          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-center gap-3 min-w-[150px]">
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-center gap-3 min-w-37.5">
             <div className="w-10 h-10 rounded-lg bg-red-600 text-white flex items-center justify-center font-bold">
               <ShoppingBag size={20} />
             </div>

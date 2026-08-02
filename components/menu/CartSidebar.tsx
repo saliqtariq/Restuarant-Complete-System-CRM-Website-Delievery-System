@@ -16,7 +16,7 @@ export default function CartSidebar() {
   const total = totalPrice();
 
   return (
-    <div className="w-full bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] flex flex-col overflow-hidden sticky top-[100px] max-h-[calc(100vh-120px)] border border-gray-100">
+    <div className="w-full bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] flex flex-col overflow-hidden sticky top-25 max-h-[calc(100vh-120px)] border border-gray-100">
       
       {/* Header */}
       <div className="pt-6 pb-4 px-6 border-b-2 border-[#e5002a] relative shrink-0">
@@ -54,7 +54,7 @@ export default function CartSidebar() {
               className="bg-[#f4f4f6] rounded-xl p-4 flex gap-4 relative"
             >
               {/* Item Image */}
-              <div className="relative w-20 h-20 flex-shrink-0 flex items-center justify-center">
+              <div className="relative w-20 h-20 shrink-0 flex items-center justify-center">
                 <Image
                   src={item.image}
                   alt={item.name}
@@ -120,7 +120,7 @@ export default function CartSidebar() {
       <div className="p-4 bg-white relative z-10 shrink-0">
         <Link 
           href="/checkout"
-          className="w-full bg-gradient-to-r from-[#e5002a] to-[#c40024] hover:from-[#c40024] hover:to-[#a0001d] text-white py-4 px-6 rounded-xl transition-all duration-300 shadow-md flex items-center justify-between group"
+          className="w-full bg-linear-to-r from-[#e5002a] to-[#c40024] hover:from-[#c40024] hover:to-[#a0001d] text-white py-4 px-6 rounded-xl transition-all duration-300 shadow-md flex items-center justify-between group"
         >
           <div className="flex items-center gap-2">
             <span className="text-xl font-medium tracking-wide">

@@ -94,6 +94,13 @@ export async function rateLimit(
     };
   }
 
+  if (process.env.NODE_ENV === "production") {
+    return {
+      limited: true,
+      retryAfter: Math.max(1, Math.ceil(windowMs / 1000)),
+    };
+  }
+
   const now = Date.now();
   const bucketKey = `${key}:${limit}:${windowMs}`;
   const current = buckets.get(bucketKey);

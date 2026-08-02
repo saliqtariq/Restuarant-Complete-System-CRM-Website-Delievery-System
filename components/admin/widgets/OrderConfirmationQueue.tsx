@@ -162,7 +162,7 @@ function ConfirmationCard({
       className={`
         bg-white rounded-[20px] border shadow-sm hover:shadow-md overflow-hidden
         transition-all duration-500 ease-in-out flex flex-col
-        ${isRemoving ? "opacity-0 scale-90 max-h-0 my-0 py-0" : "opacity-100 scale-100 max-h-[1000px]"}
+        ${isRemoving ? "opacity-0 scale-90 max-h-0 my-0 py-0" : "opacity-100 scale-100 max-h-250"}
         ${isUrgent ? "border-red-200 shadow-red-50" : "border-gray-100"}
       `}
     >
@@ -410,7 +410,7 @@ export function OrderConfirmationQueue({
           <div className="flex items-center gap-2 px-4 py-1.5 bg-[#E63946] rounded-xl shadow-sm">
             <span className="w-2 h-2 rounded-full bg-white animate-ping absolute" />
             <span className="w-2 h-2 rounded-full bg-white relative" />
-            <span className="font-black text-white text-[11px] uppercase tracking-widest mt-[1px]">
+            <span className="font-black text-white text-[11px] uppercase tracking-widest mt-px">
               {orders.length} Order{orders.length > 1 ? "s" : ""} Awaiting Confirmation
             </span>
           </div>

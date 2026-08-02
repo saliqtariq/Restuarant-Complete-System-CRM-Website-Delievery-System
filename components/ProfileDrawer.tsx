@@ -140,19 +140,19 @@ export default function ProfileDrawer({ isOpen, onClose, user, handleSignOut }: 
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-[60]"
+          className="fixed inset-0 bg-black/40 z-60"
           onClick={onClose}
         />
       )}
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[450px] bg-white z-[70] shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-112.5 bg-white z-70 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Decorative Top Accent Line */}
-        <div className="w-full h-2 bg-gradient-to-r from-[#e5002a] via-[#4a1c0d] to-[#e5002a]"></div>
+        <div className="w-full h-2 bg-linear-to-r from-[#e5002a] via-[#4a1c0d] to-[#e5002a]"></div>
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 relative">

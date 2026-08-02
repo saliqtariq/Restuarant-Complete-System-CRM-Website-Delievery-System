@@ -72,7 +72,7 @@ export default function CrowdPleasers() {
                   loading="lazy"
                 />
                 {/* Dark gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
                 {/* Title */}
                 <h3
                   className="absolute bottom-4 left-5 text-white text-4xl md:text-5xl font-bold uppercase tracking-wider drop-shadow-lg"

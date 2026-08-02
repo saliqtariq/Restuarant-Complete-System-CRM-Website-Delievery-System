@@ -1,11 +1,12 @@
 import { Resend } from "resend";
 import { supabaseAdmin } from "@/backend/supabaseServer";
 import { getVerificationEmailHtml } from "@/lib/emails/VerificationEmail";
+import { getRequiredEnv } from "@/lib/env";
 import { generateOtpCode } from "@/lib/security/otp";
 import { hashOtp } from "@/lib/security/crypto";
 import { normalizeText } from "@/lib/security/validation";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(getRequiredEnv("RESEND_API_KEY", { minLength: 20 }));
 const OTP_EXPIRY_MS = 10 * 60 * 1000;
 
 export type SendVerificationResult =

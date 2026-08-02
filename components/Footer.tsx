@@ -84,14 +84,14 @@ export default function Footer() {
 
           {/* Column 3 - User Account / Join Promo */}
           <div className="self-start w-full flex flex-col items-center justify-center md:-mt-3 md:items-end">
-            <div className="flex w-[168px] flex-col items-center text-center">
+            <div className="flex w-42 flex-col items-center text-center">
               {/* Logo */}
               <Image
                 src="/Mainlogowithnotext.png"
                 alt="Abraham's Table Logo"
                 width={52}
                 height={52}
-                className="h-[52px] w-auto object-contain"
+                className="h-13 w-auto object-contain"
               />
 
               {user ? (
@@ -154,10 +154,10 @@ export default function Footer() {
           <div className="flex flex-col">
             <h4 className="font-bold text-sm uppercase mb-3 text-[#451400]">Download Our App</h4>
             <div className="flex space-x-3">
-              <div className="w-[120px] h-[40px] bg-black rounded flex items-center justify-center text-white text-[10px]">
+              <div className="w-30 h-10 bg-black rounded flex items-center justify-center text-white text-[10px]">
                 App Store
               </div>
-              <div className="w-[120px] h-[40px] relative">
+              <div className="w-30 h-10 relative">
                 <Image src="/getitongooglePlaceholder.png" alt="Get it on Google Play" fill className="object-contain" />
               </div>
             </div>

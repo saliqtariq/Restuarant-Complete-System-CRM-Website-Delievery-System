@@ -81,10 +81,10 @@ export function FeedbackForm() {
         Leave a Suggestion
       </h4>
       
-      <div className="flex items-center justify-center gap-2 mb-8 w-full max-w-[200px]">
-        <div className="h-[1px] bg-[#e5dcd3] flex-1"></div>
+      <div className="flex items-center justify-center gap-2 mb-8 w-full max-w-50">
+        <div className="h-px bg-[#e5dcd3] flex-1"></div>
         <div className="w-2 h-2 rotate-45 border border-[#c4a47c]"></div>
-        <div className="h-[1px] bg-[#e5dcd3] flex-1"></div>
+        <div className="h-px bg-[#e5dcd3] flex-1"></div>
       </div>
 
       {success ? (
@@ -129,7 +129,7 @@ export function FeedbackForm() {
               placeholder="Your suggestion or review..."
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              className="w-full bg-[#fcfbf8] border border-[#e5dcd3] rounded-lg pl-12 pr-4 py-3 text-sm text-[#3e2b2f] placeholder-[#b4987f] focus:outline-none focus:border-[#c4a47c] focus:ring-1 focus:ring-[#c4a47c] min-h-[120px] resize-y transition-colors"
+              className="w-full bg-[#fcfbf8] border border-[#e5dcd3] rounded-lg pl-12 pr-4 py-3 text-sm text-[#3e2b2f] placeholder-[#b4987f] focus:outline-none focus:border-[#c4a47c] focus:ring-1 focus:ring-[#c4a47c] min-h-30 resize-y transition-colors"
             />
           </div>
           

@@ -43,7 +43,7 @@ function StatCard({
 }) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-start gap-4">
-      <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${color}`}>
+      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${color}`}>
         <Icon size={18} className="text-white" />
       </div>
       <div>
@@ -116,7 +116,7 @@ export function ReportsView({
           <h3 className="font-bold text-gray-900 uppercase text-sm tracking-wider mb-5">
             Sales Overview (Last 7 Days)
           </h3>
-          <div className="h-[220px]">
+          <div className="h-55">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={salesData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
@@ -159,7 +159,7 @@ export function ReportsView({
             <p className="text-gray-400 text-sm">No data yet.</p>
           ) : (
             <div className="flex flex-col items-center gap-4">
-              <div className="w-[160px] h-[160px] relative">
+              <div className="w-40 h-40 relative">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -191,7 +191,7 @@ export function ReportsView({
                     <div key={i} className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
                         <div
-                          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                          className="w-2.5 h-2.5 rounded-full shrink-0"
                           style={{ backgroundColor: item.color }}
                         />
                         <span className="font-bold text-gray-700">{item.name}</span>

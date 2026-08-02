@@ -170,7 +170,7 @@ export function LiveOrdersTable({
                 >
                   <td className="px-5 py-3.5 font-bold text-gray-900">{order.order_number}</td>
                   <td className="px-5 py-3.5">
-                    <div className="font-bold text-gray-900 text-[12px] truncate max-w-[120px]">{order.customer_name}</div>
+                    <div className="font-bold text-gray-900 text-[12px] truncate max-w-30">{order.customer_name}</div>
                     <div className="text-gray-400 text-[10px]">{order.phone}</div>
                   </td>
                   <td className="px-5 py-3.5">
@@ -190,14 +190,14 @@ export function LiveOrdersTable({
                   </td>
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-1.5 mb-0.5">
-                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${cfg.dot} ${order.status === "cooking" ? "animate-pulse" : ""}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg.dot} ${order.status === "cooking" ? "animate-pulse" : ""}`} />
                       <span className="font-bold text-gray-900 text-[11px]">{cfg.text}</span>
                     </div>
                     <div className="text-gray-400 text-[10px] pl-3">{cfg.sub}</div>
                     {order.driver && order.order_type === "delivery" && order.status !== "delivered" && (
                       <div className="mt-1 pl-3 flex items-center gap-1 text-[10px] text-blue-600">
-                        <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                        <span className="font-medium truncate max-w-[80px]" title={order.driver.name}>{order.driver.name}</span>
+                        <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                        <span className="font-medium truncate max-w-20" title={order.driver.name}>{order.driver.name}</span>
                       </div>
                     )}
                   </td>

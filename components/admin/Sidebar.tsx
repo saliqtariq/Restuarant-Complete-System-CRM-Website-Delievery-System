@@ -113,7 +113,7 @@ export function Sidebar({ counts }: SidebarProps) {
                 <span>{item.name}</span>
               </div>
               {item.badge && (
-                <span className="bg-[#E63946] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+                <span className="bg-[#E63946] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-5 text-center">
                   {item.badge}
                 </span>
               )}
@@ -139,7 +139,7 @@ export function Sidebar({ counts }: SidebarProps) {
   return (
     <>
       {/* Desktop sidebar — always visible on lg+ */}
-      <aside className="hidden lg:flex w-[220px] shrink-0 bg-[#3B0A0A] text-white flex-col h-screen sticky top-0 overflow-y-auto sidebar-scroll">
+      <aside className="hidden lg:flex w-55 shrink-0 bg-[#3B0A0A] text-white flex-col h-screen sticky top-0 overflow-y-auto sidebar-scroll">
         {sidebarContent}
       </aside>
 
@@ -153,7 +153,7 @@ export function Sidebar({ counts }: SidebarProps) {
 
       {/* Mobile sidebar — slide in from left */}
       <aside
-        className={`fixed top-0 left-0 h-full w-[260px] bg-[#3B0A0A] text-white flex flex-col z-50 lg:hidden transform transition-transform duration-300 ease-in-out overflow-y-auto sidebar-scroll ${
+        className={`fixed top-0 left-0 h-full w-65 bg-[#3B0A0A] text-white flex flex-col z-50 lg:hidden transform transition-transform duration-300 ease-in-out overflow-y-auto sidebar-scroll ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

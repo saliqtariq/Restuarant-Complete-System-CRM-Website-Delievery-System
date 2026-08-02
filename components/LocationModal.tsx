@@ -104,11 +104,11 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
       : null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex bg-black/60 backdrop-blur-sm p-0 md:p-6 lg:p-10">
-      <div className="bg-white w-full h-full max-w-[1400px] mx-auto md:rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row relative">
+    <div className="fixed inset-0 z-100 flex bg-black/60 backdrop-blur-sm p-0 md:p-6 lg:p-10">
+      <div className="bg-white w-full h-full max-w-350 mx-auto md:rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row relative">
 
         {/* ─── Left Sidebar ─── */}
-        <div className="w-full md:w-[420px] lg:w-[460px] shrink-0 flex flex-col bg-[#faf8f5] z-10 shadow-[4px_0_30px_rgba(0,0,0,0.07)] h-1/2 md:h-full">
+        <div className="w-full md:w-105 lg:w-115 shrink-0 flex flex-col bg-[#faf8f5] z-10 shadow-[4px_0_30px_rgba(0,0,0,0.07)] h-1/2 md:h-full">
 
           {/* Toggle Pill — pinned at top */}
           <div className="px-7 pt-6 pb-0 shrink-0">
@@ -215,7 +215,7 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
                       >
                         {selectedAddress ? "Location Selected" : "Use This Address?"}
                       </h3>
-                      <p className="text-gray-500 mb-8 text-[14px] max-w-[260px] leading-relaxed">
+                      <p className="text-gray-500 mb-8 text-[14px] max-w-65 leading-relaxed">
                         {selectedAddress || searchQuery}
                       </p>
                       <button
@@ -232,10 +232,10 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
                       <div className="relative w-36 h-36 mb-5 opacity-[0.12]">
                         <Image src="/Mainlogowithnotext.png" alt="Watermark" fill className="object-contain" />
                       </div>
-                      <p className="text-[#7a5c4a] font-semibold text-[15px] mb-2 max-w-[240px] leading-relaxed">
+                      <p className="text-[#7a5c4a] font-semibold text-[15px] mb-2 max-w-60 leading-relaxed">
                         Find a location to order online, see a menu, and get info.
                       </p>
-                      <p className="text-[#b09080] text-xs max-w-[220px] leading-relaxed">
+                      <p className="text-[#b09080] text-xs max-w-55 leading-relaxed">
                         Delivery pricing and fees may apply.
                       </p>
                     </div>
@@ -328,7 +328,7 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
 
           {/* Floating Pill Status */}
           {(selectedAddress || currentOutletName) && (
-            <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-white rounded-full shadow-lg px-6 py-3 flex items-center gap-3 z-20 whitespace-nowrap hidden sm:flex">
+            <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-white rounded-full shadow-lg px-6 py-3 items-center gap-3 z-20 whitespace-nowrap hidden sm:flex">
               {activeTab === "pickup" ? (
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-[#451400] shrink-0">
                   <path d="M3 2v6c0 1.66 1.34 3 3 3h0v11h2V11h0c1.66 0 3-1.34 3-3V2H9v5H7V2H5v5H3V2H3z" fill="currentColor"/>
@@ -343,7 +343,7 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                   {activeTab === "pickup" ? "PICKUP FROM" : "DELIVERING TO"}
                 </span>
-                <span className="text-sm font-bold text-[#111] max-w-[200px] truncate">
+                <span className="text-sm font-bold text-[#111] max-w-50 truncate">
                   {activeTab === "pickup" ? currentOutletName : selectedAddress || searchQuery}
                 </span>
               </div>

@@ -59,14 +59,14 @@ function ToastItem({ toast }: { toast: ToastMessage }) {
 
   return (
     <div
-      className={`flex items-center gap-4 bg-white rounded-2xl shadow-xl border border-gray-100 px-5 py-4 min-w-[340px] max-w-[420px] transition-all duration-300 ease-out ${
+      className={`flex items-center gap-4 bg-white rounded-2xl shadow-xl border border-gray-100 px-5 py-4 min-w-85 max-w-105 transition-all duration-300 ease-out ${
         visible && !exiting
           ? "translate-x-0 opacity-100"
           : "translate-x-[120%] opacity-0"
       }`}
     >
       {/* Green Check */}
-      <div className="flex-shrink-0 w-10 h-10 bg-green-500 rounded-full flex items-center justify-center shadow-sm">
+      <div className="shrink-0 w-10 h-10 bg-green-500 rounded-full flex items-center justify-center shadow-sm">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-5 w-5 text-white"
@@ -81,7 +81,7 @@ function ToastItem({ toast }: { toast: ToastMessage }) {
 
       {/* Item Thumbnail */}
       {toast.image && (
-        <div className="relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
+        <div className="relative w-14 h-14 shrink-0 rounded-lg overflow-hidden bg-gray-50">
           <Image
             src={toast.image}
             alt={toast.name}
@@ -108,7 +108,7 @@ function ToastItem({ toast }: { toast: ToastMessage }) {
       {/* Close */}
       <button
         onClick={handleClose}
-        className="flex-shrink-0 text-gray-300 hover:text-gray-500 transition-colors p-1"
+        className="shrink-0 text-gray-300 hover:text-gray-500 transition-colors p-1"
         aria-label="Dismiss"
       >
         <X size={18} strokeWidth={2.5} />
@@ -124,7 +124,7 @@ export default function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed top-6 right-6 z-[100] flex flex-col gap-2 pointer-events-auto">
+    <div className="fixed top-6 right-6 z-100 flex flex-col gap-2 pointer-events-auto">
       {toasts.map((t) => (
         <ToastItem key={t.id} toast={t} />
       ))}

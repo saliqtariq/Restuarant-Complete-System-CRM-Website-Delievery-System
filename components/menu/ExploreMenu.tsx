@@ -58,7 +58,7 @@ export default function ExploreMenu() {
           <button 
             onClick={() => scroll("left")}
             disabled={!canScrollLeft}
-            className={`flex-shrink-0 w-8 h-8 md:w-10 md:h-10 bg-[#e4002b] rounded-full flex items-center justify-center text-white shadow-md transition-all focus:outline-none ${!canScrollLeft ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#c30025]'}`}
+            className={`shrink-0 w-8 h-8 md:w-10 md:h-10 bg-[#e4002b] rounded-full flex items-center justify-center text-white shadow-md transition-all focus:outline-none ${!canScrollLeft ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#c30025]'}`}
             aria-label="Scroll left"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -78,7 +78,7 @@ export default function ExploreMenu() {
               <Link 
                 key={index} 
                 href={`/menu#${categoryId}`}
-                className="flex-shrink-0 snap-center cursor-pointer relative group"
+                className="shrink-0 snap-center cursor-pointer relative group"
                 style={{ width: "220px", height: "240px", marginTop: "40px" }}
               >
                 {/* Card Background */}
@@ -88,7 +88,7 @@ export default function ExploreMenu() {
                    }}>
                 
                 {/* Image (popping out significantly) */}
-                <div className="absolute top-[-50px] bottom-[85px] left-1/2 transform -translate-x-1/2 w-[130%] transition-transform duration-300 group-hover:scale-105 pointer-events-none">
+                <div className="absolute -top-12.5 bottom-21.25 left-1/2 transform -translate-x-1/2 w-[130%] transition-transform duration-300 group-hover:scale-105 pointer-events-none">
                   <Image
                     src={cat.image}
                     alt={cat.name}
@@ -118,7 +118,7 @@ export default function ExploreMenu() {
           <button 
             onClick={() => scroll("right")}
             disabled={!canScrollRight}
-            className={`flex-shrink-0 w-8 h-8 md:w-10 md:h-10 bg-[#e4002b] rounded-full flex items-center justify-center text-white shadow-md transition-all focus:outline-none ${!canScrollRight ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#c30025]'}`}
+            className={`shrink-0 w-8 h-8 md:w-10 md:h-10 bg-[#e4002b] rounded-full flex items-center justify-center text-white shadow-md transition-all focus:outline-none ${!canScrollRight ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#c30025]'}`}
             aria-label="Scroll right"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
