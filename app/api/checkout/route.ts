@@ -88,6 +88,7 @@ export async function POST(req: Request) {
           grand_total: totals.grandTotal,
           payment_method: delivery.paymentMethod,
           status: "pending",
+          created_at: new Date().toISOString(),
         },
       ])
       .select()

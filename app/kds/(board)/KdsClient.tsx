@@ -12,6 +12,8 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 
 function parseOrderDate(dateString: string) {
@@ -58,7 +60,7 @@ function KdsTicket({
       <div className={`flex justify-between items-center px-5 py-3.5 ${headerBg}`}>
         <div>
           <div className="font-extrabold text-2xl text-white tracking-tight">
-            #{order.order_number}
+            {order.order_type === "takeaway" ? `Token ID #${order.order_number}` : `#${order.order_number}`}
           </div>
           <div className="text-xs font-bold uppercase tracking-widest opacity-80 mt-0.5">
             {order.order_type}
@@ -101,9 +103,24 @@ function KdsTicket({
               <div className="w-9 h-9 rounded-lg bg-slate-700 border border-slate-600 flex items-center justify-center font-black text-lg text-white shrink-0">
                 {item.quantity}
               </div>
-              <p className="font-semibold text-lg leading-snug text-slate-100">
-                {item.item_name}
-              </p>
+              {(() => {
+                const noteMatch = item.item_name.match(/^(.*?)\s*\[Note:\s*(.*?)\]$/);
+                const title = noteMatch ? noteMatch[1] : item.item_name;
+                const note = noteMatch ? noteMatch[2] : null;
+
+                return (
+                  <div className="flex-1">
+                    <p className="font-semibold text-lg leading-snug text-slate-100">
+                      {title}
+                    </p>
+                    {note && (
+                      <p className="inline-block mt-1 px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-bold text-xs border border-amber-500/30">
+                        ⚡ {note}
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           ))
         ) : (
@@ -138,6 +155,21 @@ export function KdsClient({ initialOrders }: { initialOrders: KdsOrder[] }) {
   const [removingIds, setRemovingIds] = useState<Set<string>>(new Set());
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
+
+  useEffect(() => {
+    const onFsChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onFsChange);
+    return () => document.removeEventListener("fullscreenchange", onFsChange);
+  }, []);
 
   const prevOrderCountRef = useRef(initialOrders.length);
 
@@ -285,6 +317,14 @@ export function KdsClient({ initialOrders }: { initialOrders: KdsOrder[] }) {
           <div className="text-slate-400 font-mono text-sm" suppressHydrationWarning>
             {now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           </div>
+          <button
+            onClick={toggleFullscreen}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-semibold border border-slate-700 transition-colors"
+            title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+          >
+            {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+            {isFullscreen ? "Exit" : "Fullscreen"}
+          </button>
           <form action={logoutKds}>
             <button
               type="submit"

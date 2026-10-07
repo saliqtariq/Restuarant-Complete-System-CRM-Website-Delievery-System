@@ -8,14 +8,15 @@ import { ReactNode } from "react";
 export function StoreLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   
-  // If we are on the dashboard, admin, kds, or delivery routes, don't show the store Navbar/Footer
-  const isAdminOrKds = 
+  // If we are on the dashboard, admin, kds, delivery, or takeaway routes, don't show the store Navbar/Footer
+  const isStandaloneApp = 
     pathname?.startsWith("/dashboard") || 
     pathname?.startsWith("/admin") || 
     pathname?.startsWith("/kds") ||
-    pathname?.startsWith("/delivery");
+    pathname?.startsWith("/delivery") ||
+    pathname?.startsWith("/takeaway");
 
-  if (isAdminOrKds) {
+  if (isStandaloneApp) {
     return <>{children}</>;
   }
 
