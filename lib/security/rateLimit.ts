@@ -94,11 +94,14 @@ export async function rateLimit(
     };
   }
 
+  // Redis is not configured — warn and fall through to in-memory limiter.
+  // (Previously this hard-blocked all requests in production, which is wrong.)
   if (process.env.NODE_ENV === "production") {
-    return {
-      limited: true,
-      retryAfter: Math.max(1, Math.ceil(windowMs / 1000)),
-    };
+    console.warn(
+      "[rateLimit] Upstash Redis is not configured. " +
+      "Falling back to in-memory rate limiting. " +
+      "Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel environment variables."
+    );
   }
 
   const now = Date.now();
