@@ -78,13 +78,21 @@ export async function loginTakeaway(password: string): Promise<{ success: boolea
     return { success: false, error: "Takeaway password not configured on server." };
   }
 
-  if (verifyTakeawayPassword(password)) {
-    const token = await createTakeawaySessionToken();
-    (await cookies()).set(TAKEAWAY_SESSION_COOKIE, token, getTakeawaySessionCookieOptions());
-    return { success: true };
-  }
+  try {
+    if (verifyTakeawayPassword(password)) {
+      const token = await createTakeawaySessionToken();
+      (await cookies()).set(TAKEAWAY_SESSION_COOKIE, token, getTakeawaySessionCookieOptions());
+      return { success: true };
+    }
 
-  return { success: false, error: "Invalid password" };
+    return { success: false, error: "Invalid password" };
+  } catch (error) {
+    console.error("loginTakeaway error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to sign in. Please verify server configuration.",
+    };
+  }
 }
 
 export async function logoutTakeaway() {

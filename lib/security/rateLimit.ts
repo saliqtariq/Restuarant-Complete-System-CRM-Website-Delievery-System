@@ -87,11 +87,15 @@ export async function rateLimit(
 ): Promise<RateLimitResult> {
   const redisLimiter = getRedisRateLimiter(limit, windowMs);
   if (redisLimiter) {
-    const result = await redisLimiter.limit(key);
-    return {
-      limited: !result.success,
-      retryAfter: result.reset > 0 ? Math.max(0, Math.ceil((result.reset - Date.now()) / 1000)) : 0,
-    };
+    try {
+      const result = await redisLimiter.limit(key);
+      return {
+        limited: !result.success,
+        retryAfter: result.reset > 0 ? Math.max(0, Math.ceil((result.reset - Date.now()) / 1000)) : 0,
+      };
+    } catch (err) {
+      console.error("[rateLimit] Redis limit error, falling back to in-memory:", err);
+    }
   }
 
   // Redis is not configured — warn and fall through to in-memory limiter.

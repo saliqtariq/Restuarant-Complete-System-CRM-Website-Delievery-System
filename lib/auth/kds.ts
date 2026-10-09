@@ -13,11 +13,16 @@ export const KDS_ALLOWED_STATUSES = ["ready", "out_for_delivery", "delivered"] a
 export type KdsOrderStatus = (typeof KDS_ALLOWED_STATUSES)[number];
 
 function getKdsSessionSecret(): string {
-  return getRequiredEnv("KDS_SESSION_SECRET", { minLength: 32 });
+  const secret = process.env.KDS_SESSION_SECRET;
+  if (!secret || secret.length < 32) {
+    throw new Error("KDS_SESSION_SECRET must be set and at least 32 characters long.");
+  }
+  return secret;
 }
 
 export function verifyKdsPassword(password: string): boolean {
-  const expectedPassword = getRequiredEnv("KDS_PASSWORD", { minLength: 8 });
+  const expectedPassword = process.env.KDS_PASSWORD;
+  if (!expectedPassword) return false;
   return timingSafeEqual(password, expectedPassword);
 }
 
@@ -26,7 +31,8 @@ export async function createKdsSessionToken(): Promise<string> {
 }
 
 export async function verifyKdsSessionToken(token: string): Promise<boolean> {
-  const secret = getRequiredEnv("KDS_SESSION_SECRET", { minLength: 32 });
+  const secret = process.env.KDS_SESSION_SECRET;
+  if (!secret || secret.length < 32) return false;
   return verifySignedToken(token, secret, "kds");
 }
 

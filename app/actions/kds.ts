@@ -85,13 +85,21 @@ export async function loginKds(password: string): Promise<{ success: boolean; er
     return { success: false, error: "KDS password not configured on server." };
   }
 
-  if (verifyKdsPassword(password)) {
-    const token = await createKdsSessionToken();
-    (await cookies()).set(KDS_SESSION_COOKIE, token, getKdsSessionCookieOptions());
-    return { success: true };
-  }
+  try {
+    if (verifyKdsPassword(password)) {
+      const token = await createKdsSessionToken();
+      (await cookies()).set(KDS_SESSION_COOKIE, token, getKdsSessionCookieOptions());
+      return { success: true };
+    }
 
-  return { success: false, error: "Invalid password" };
+    return { success: false, error: "Invalid password" };
+  } catch (error) {
+    console.error("loginKds error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to sign in. Please verify server configuration.",
+    };
+  }
 }
 
 export async function isKdsAuthenticated(): Promise<boolean> {
